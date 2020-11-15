@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Clkd.GUI.Interfaces;
 
-namespace Clkd.GUI.Layout
+[assembly: InternalsVisibleTo("CloakedUITests")]
+namespace Clkd.GUI.Layouts
 {
     public class GuiGridLayout : AbstractGuiLayout
     {
@@ -24,7 +26,7 @@ namespace Clkd.GUI.Layout
 
         public void AddComponent(int row, int column, AbstractGuiComponent component)
         {
-            if (Components[row, column] != null)
+            if (Components[row, column] == null)
             {
                 Components[row, column] = component;
                 Dirty = true;
@@ -50,6 +52,7 @@ namespace Clkd.GUI.Layout
             int column = 0;
             float yOffset = 0f;
             float xOffset = 0f;
+            float maxWidth = 0f;
             foreach (AbstractGuiComponent component in Components)
             {
                 if (row == 0)
@@ -64,22 +67,36 @@ namespace Clkd.GUI.Layout
                 if (column == 0)
                 {
                     xOffset = parent.LeftPadding;
+                    maxWidth = 0f;
                 }
 
-                SetChildGuiCoordinate(parent.GuiCoordinate, component, xOffset, yOffset);
-
-                if (component is GuiContainer c)
+                if (component != null)
                 {
-                    c.Layout.RecalculateChildren(c);
+                    SetChildGuiCoordinate(
+                        parentGuiCoordinate: parent.GuiCoordinate,
+                        childComponent: component,
+                        xOffset: xOffset,
+                        yOffset: yOffset);
+
+                    if (component is GuiContainer c)
+                    {
+                        c.Layout.RecalculateChildren(c);
+                    }
+
+                    yOffset += component.RealHeight;
+                    if (component.RealWidth > maxWidth)
+                    {
+                        maxWidth = component.RealWidth;
+                    }
                 }
 
-                yOffset += component.RealHeight;
                 row++;
-                if (row == (Rows - 1))
+                if (row == Rows)
                 {
                     column++;
                     row = 0;
                     xOffset += VerticalGutter;
+                    xOffset += maxWidth;
                 }
             }
             Dirty = false;
@@ -87,7 +104,12 @@ namespace Clkd.GUI.Layout
 
         private void SetChildGuiCoordinate(GuiCoordinate parentGuiCoordinate, AbstractGuiComponent childComponent, float xOffset, float yOffset)
         {
-            childComponent.GuiCoordinate.UpdateCoordinate(parentGuiCoordinate, xOffset, yOffset);
+
+            childComponent.UpdatePosition(
+                parentCoordinate: parentGuiCoordinate,
+                xOffset: xOffset,
+                yOffset: yOffset);
+
         }
 
     }

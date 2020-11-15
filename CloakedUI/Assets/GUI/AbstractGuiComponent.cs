@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Clkd.Assets;
-using Clkd.GUI.Layout;
-using Clkd.Main;
+
 using Microsoft.Xna.Framework;
+
+using Clkd.Assets;
+using Clkd.Main;
 
 namespace Clkd.GUI
 {
@@ -34,7 +35,7 @@ namespace Clkd.GUI
                     throw new ArgumentOutOfRangeException("Width", "Width must be greater than zero.");
                 }
                 _width = value;
-                if (value < 1)
+                if (value <= 1)
                 {
                     HasRelativeWidth = true;
                 }
@@ -56,7 +57,7 @@ namespace Clkd.GUI
                     throw new ArgumentOutOfRangeException("Height", "Height must be greater than zero.");
                 }
                 _height = value;
-                if (value < 1)
+                if (value <= 1)
                 {
                     HasRelativeHeight = true;
                 }
@@ -77,5 +78,13 @@ namespace Clkd.GUI
         public abstract override List<Renderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null);
 
         public abstract override void Update(GameTime gameTime);
+
+        public virtual void UpdatePosition(GuiCoordinate parentCoordinate, float xOffset, float yOffset)
+        {
+            GuiCoordinate.UpdateCoordinate(
+                parentCoordinate: parentCoordinate,
+                xOffset: xOffset,
+                yOffset: yOffset);
+        }
     }
 }

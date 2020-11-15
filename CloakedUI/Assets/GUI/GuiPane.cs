@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using Clkd.Assets;
-using Clkd.GUI.Interfaces;
 using Clkd.Main;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,32 +9,53 @@ namespace Clkd.GUI
 {
     public class GuiPane : AbstractGuiComponent
     {
-        private GuiContainer RootContainer { get; set; }
-        public Vector2 Position { get; set; }
-        public GraphicsDevice GraphicsDevice { get; set; }
-
-        public GuiPane(GuiContainer rootContainer, GraphicsDevice graphicsDevice, Vector2 position)
+        public GuiContainer RootContainer { get; set; }
+        private Vector2 _position;
+        public Vector2 Position
         {
-            GuiCoordinate = BuildGuiCoordinate(graphicsDevice.Viewport.Bounds, position);
-            GraphicsDevice = graphicsDevice;
+            get => _position;
+            set
+            {
+                GuiCoordinate.XOffset = value.X;
+                GuiCoordinate.YOffset = value.Y;
+                _position = value;
+            }
+        }
+        public bool Initialized { get; private set; }
+
+        public GuiPane(GuiContainer rootContainer, Vector2 position = default(Vector2))
+        {
             Position = position;
             RootContainer = rootContainer;
         }
 
         public override List<Renderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null)
         {
+            if (!Initialized) return null;
             return RootContainer.GetRenderables();
         }
 
         public override void Update(GameTime gameTime)
         {
+            if (!Initialized) return;
             RootContainer.Update(gameTime);
+        }
+
+        public void Initialize()
+        {
+            GuiCoordinate = BuildGuiCoordinate(Cloaked.GraphicsDeviceManager.GraphicsDevice.Viewport.Bounds, Position);
+            SetRootGuiCoordinate();
+            Initialized = true;
+        }
+
+        private void SetRootGuiCoordinate()
+        {
+            RootContainer.UpdatePosition(GuiCoordinate, 0f, 0f);
         }
 
         private GuiCoordinate BuildGuiCoordinate(Rectangle bounds, Vector2 position)
         {
             return new GuiCoordinate(bounds.X, bounds.Y, bounds.Width, bounds.Height, position.X, position.Y, this);
         }
-
     }
 }

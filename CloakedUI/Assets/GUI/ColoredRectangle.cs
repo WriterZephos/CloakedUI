@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Clkd.GUI
 {
-    class ColoredRectangle : AbstractGuiComponent
+    public class ColoredRectangle : AbstractGuiComponent
     {
         public Color Color { get; set; }
         public Sprite Sprite { get; set; }
@@ -23,11 +23,6 @@ namespace Clkd.GUI
         public override void Update(GameTime gameTime)
         {
             return;
-        }
-
-        private static GuiCoordinate BuildGuiCoordinate(float width, float height)
-        {
-            return new GuiCoordinate(0, 0, 0, 0, 0, 0, null);
         }
     }
 }

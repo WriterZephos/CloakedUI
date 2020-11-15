@@ -12,7 +12,7 @@ namespace Clkd.GUI
     {
         public AbstractGuiLayout Layout { get; set; }
 
-        GuiContainer(GuiCoordinate guiCoordinate, AbstractGuiLayout layout) : base(guiCoordinate)
+        public GuiContainer(AbstractGuiLayout layout, GuiCoordinate guiCoordinate = null) : base(guiCoordinate)
         {
             Layout = layout;
         }
@@ -20,6 +20,7 @@ namespace Clkd.GUI
         public override List<Renderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null)
         {
             return Layout
+                .Where((component) => component != null)
                 .Select(child => child.GetRenderables())
                 .Where((list) => list != null).Aggregate(
                     new List<Renderable>(),
@@ -40,8 +41,13 @@ namespace Clkd.GUI
 
             foreach (AbstractGuiComponent c in Layout)
             {
-                c.Update(gameTime);
+                if (c != null) c.Update(gameTime);
             }
+        }
+
+        public T GetLayout<T>() where T : AbstractGuiLayout
+        {
+            return Layout as T;
         }
     }
 }
