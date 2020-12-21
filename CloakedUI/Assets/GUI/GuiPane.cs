@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
+
+using Microsoft.Xna.Framework;
+
 using Clkd.Assets;
 using Clkd.Main;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Clkd.GUI
 {

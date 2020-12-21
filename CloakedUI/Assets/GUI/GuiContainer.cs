@@ -12,7 +12,7 @@ namespace Clkd.GUI
     {
         public AbstractGuiLayout Layout { get; set; }
 
-        public GuiContainer(AbstractGuiLayout layout) : base()
+        public GuiContainer(AbstractGuiLayout layout)
         {
             Layout = layout;
         }
@@ -36,7 +36,7 @@ namespace Clkd.GUI
         {
             if (Layout.Dirty)
             {
-                Layout.RecalculateChildren(this);
+                RecalculateChildren();
             }
 
             foreach (AbstractGuiComponent c in Layout)
@@ -48,6 +48,11 @@ namespace Clkd.GUI
         public T GetLayout<T>() where T : AbstractGuiLayout
         {
             return Layout as T;
+        }
+
+        public void RecalculateChildren()
+        {
+            Layout.RecalculateChildren(this);
         }
     }
 }

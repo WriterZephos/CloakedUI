@@ -4,6 +4,9 @@ using Microsoft.Xna.Framework;
 
 namespace Clkd.GUI
 {
+    //TODO: Extract a parent class that is just a rect, 
+    //then add support for custom textures and rename this class or make a similar class
+    //called TexturedRectangle
     public class ColoredRectangle : AbstractGuiComponent
     {
         public Color Color { get; set; }
