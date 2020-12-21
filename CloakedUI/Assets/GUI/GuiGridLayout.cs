@@ -72,8 +72,8 @@ namespace Clkd.GUI.Layouts
 
                 if (component != null)
                 {
-                    SetChildGuiCoordinate(
-                        parentGuiCoordinate: parent.GuiCoordinate,
+                    SetChildPosition(
+                        parent: parent,
                         childComponent: component,
                         xOffset: xOffset,
                         yOffset: yOffset);
@@ -102,11 +102,10 @@ namespace Clkd.GUI.Layouts
             Dirty = false;
         }
 
-        private void SetChildGuiCoordinate(GuiCoordinate parentGuiCoordinate, AbstractGuiComponent childComponent, float xOffset, float yOffset)
+        private void SetChildPosition(GuiContainer parent, AbstractGuiComponent childComponent, float xOffset, float yOffset)
         {
-
             childComponent.UpdatePosition(
-                parentCoordinate: parentGuiCoordinate,
+                parent: parent,
                 xOffset: xOffset,
                 yOffset: yOffset);
 

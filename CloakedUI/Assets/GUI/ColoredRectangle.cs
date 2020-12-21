@@ -8,7 +8,7 @@ namespace Clkd.GUI
     {
         public Color Color { get; set; }
         public Sprite Sprite { get; set; }
-        public ColoredRectangle(float width, float height, Color color) : base(null)
+        public ColoredRectangle(float width, float height, Color color) : base()
         {
             Width = width;
             Height = height;

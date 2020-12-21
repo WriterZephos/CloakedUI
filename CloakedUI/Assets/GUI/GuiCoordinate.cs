@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Clkd.GUI
 {
+    //TODO: add support for limiting the size of a component and setting overflow behavior
     public class GuiCoordinate
     {
         public float ParentRealX { get; set; }
@@ -12,7 +13,8 @@ namespace Clkd.GUI
         public float ParentRealHeight { get; set; }
         public float XOffset { get; set; }
         public float YOffset { get; set; }
-
+        public float MaxWidth { get; set; }
+        public float MaxHeight { get; set; }
         public float RealX
         {
             get => CalculateRealX();
@@ -45,7 +47,9 @@ namespace Clkd.GUI
             float yOffset,
             AbstractGuiComponent child)
         {
-            UpdateCoordinate(
+            Parent = null;
+            Child = child;
+            UpdateCoordinateValues(
                 parentRealX: parentRealX,
                 parentRealY: parentRealY,
                 parentRealWidth: parentRealWidth,
@@ -55,24 +59,36 @@ namespace Clkd.GUI
             Child = child;
         }
 
-        public GuiCoordinate(GuiCoordinate parentCoordinate, float xOffset, float yOffset, AbstractGuiComponent child)
-        {
-            Child = child;
-            UpdateCoordinate(
-                parentRealX: parentCoordinate.RealX,
-                parentRealY: parentCoordinate.RealY,
-                parentRealWidth: parentCoordinate.RealWidth,
-                parentRealHeight: ParentRealHeight = RealHeight,
-                xOffset: xOffset,
-                yOffset: yOffset);
-        }
-
         public RenderableCoordinate GetRenerableCoordinate()
         {
             return new RenderableCoordinate((int)RealX, (int)RealY, 0, (int)RealWidth, (int)RealHeight);
         }
 
         public void UpdateCoordinate(float parentRealX, float parentRealY, float parentRealWidth, float parentRealHeight, float xOffset, float yOffset)
+        {
+            Parent = null;
+            UpdateCoordinateValues(
+                parentRealX: parentRealX,
+                parentRealY: parentRealY,
+                parentRealWidth: parentRealWidth,
+                parentRealHeight: parentRealHeight,
+                xOffset: xOffset,
+                yOffset: yOffset);
+        }
+
+        public void UpdateCoordinate(GuiCoordinate guiCoordinate, float xOffset, float yOffset)
+        {
+            Parent = null;
+            UpdateCoordinateValues(
+                parentRealX: guiCoordinate.RealX,
+                parentRealY: guiCoordinate.RealY,
+                parentRealWidth: guiCoordinate.RealWidth,
+                parentRealHeight: guiCoordinate.RealHeight,
+                xOffset: xOffset,
+                yOffset: yOffset);
+        }
+
+        private void UpdateCoordinateValues(float parentRealX, float parentRealY, float parentRealWidth, float parentRealHeight, float xOffset, float yOffset)
         {
             ParentRealX = parentRealX;
             ParentRealY = parentRealY;
@@ -82,13 +98,14 @@ namespace Clkd.GUI
             YOffset = yOffset;
         }
 
-        public void UpdateCoordinate(GuiCoordinate parentCoordinate, float xOffset, float yOffset)
+        public void UpdateCoordinate(GuiContainer parent, float xOffset, float yOffset)
         {
-            UpdateCoordinate(
-                parentRealX: parentCoordinate.RealX,
-                parentRealY: parentCoordinate.RealY,
-                parentRealWidth: parentCoordinate.RealWidth,
-                parentRealHeight: ParentRealHeight = parentCoordinate.RealHeight,
+            Parent = parent;
+            UpdateCoordinateValues(
+                parentRealX: parent.GuiCoordinate.RealX,
+                parentRealY: parent.GuiCoordinate.RealY,
+                parentRealWidth: parent.GuiCoordinate.RealWidth,
+                parentRealHeight: parent.GuiCoordinate.RealHeight,
                 xOffset: xOffset,
                 yOffset: yOffset);
         }

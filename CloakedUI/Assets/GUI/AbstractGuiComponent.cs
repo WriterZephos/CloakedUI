@@ -5,16 +5,15 @@ using Microsoft.Xna.Framework;
 
 using Clkd.Assets;
 using Clkd.Main;
+using Clkd.State;
+using CloakedUI.Exceptions;
 
 namespace Clkd.GUI
 {
     public abstract class AbstractGuiComponent : AbstractComponent
     {
+        public Guid Guid { get; set; }
         public GuiCoordinate GuiCoordinate { get; set; }
-        public AbstractGuiComponent(GuiCoordinate guiCoordinate = null) : base(canGetRenderables: true, canUpdate: true)
-        {
-            GuiCoordinate = guiCoordinate != null ? guiCoordinate : new GuiCoordinate(0, 0, 0, 0, 0, 0, this);
-        }
         public float LeftMargin { get; set; }
         public float RightMargin { get; set; }
         public float TopMargin { get; set; }
@@ -75,16 +74,47 @@ namespace Clkd.GUI
         {
             get => GuiCoordinate.RealHeight;
         }
+
+        public AbstractGuiComponent() : base(canGetRenderables: true, canUpdate: true)
+        {
+            GuiCoordinate = new GuiCoordinate(0, 0, 0, 0, 0, 0, this);
+            Guid = Guid.NewGuid();
+        }
+
         public abstract override List<Renderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null);
 
         public abstract override void Update(GameTime gameTime);
 
-        public virtual void UpdatePosition(GuiCoordinate parentCoordinate, float xOffset, float yOffset)
+        public virtual void UpdatePosition(GuiContainer parent, float xOffset, float yOffset)
         {
             GuiCoordinate.UpdateCoordinate(
-                parentCoordinate: parentCoordinate,
+                parent: parent,
                 xOffset: xOffset,
                 yOffset: yOffset);
+        }
+
+        public virtual void UpdatePosition(GuiCoordinate guiCoordinate, float xOffset, float yOffset)
+        {
+            GuiCoordinate.UpdateCoordinate(
+                guiCoordinate: guiCoordinate,
+                xOffset: xOffset,
+                yOffset: yOffset);
+        }
+
+        private GuiPane GetRootPane()
+        {
+            GuiCoordinate currentCoordinate = GuiCoordinate;
+            while (currentCoordinate.Parent != null)
+            {
+                currentCoordinate = currentCoordinate.Parent.GuiCoordinate;
+            }
+
+            if (currentCoordinate.Child is GuiPane gp)
+            {
+                return gp;
+            }
+
+            throw new OrphanedGuiComponentException("Could not reach a GuiPane instance by traversing up the hierarchy.");
         }
     }
 }

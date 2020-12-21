@@ -12,7 +12,7 @@ namespace Clkd.GUI
     {
         public AbstractGuiLayout Layout { get; set; }
 
-        public GuiContainer(AbstractGuiLayout layout, GuiCoordinate guiCoordinate = null) : base(guiCoordinate)
+        public GuiContainer(AbstractGuiLayout layout) : base()
         {
             Layout = layout;
         }
