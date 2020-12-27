@@ -40,7 +40,7 @@ namespace ClkdUI.Assets
 
             foreach (AbstractGuiComponent c in Layout)
             {
-                if (c != null) c.Update(gameTime);
+                if (c != null) c.UpdateInternal(gameTime);
             }
         }
 

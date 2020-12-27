@@ -26,7 +26,7 @@ namespace ClkdUI.Layouts
             Components = new AbstractGuiComponent[Rows, Columns];
         }
 
-        public GuiGridLayout AddComponent(int row, int column, AbstractGuiComponent component)
+        public GuiGridLayout AddGuiComponent(int row, int column, AbstractGuiComponent component)
         {
             if (Components[row, column] == null)
             {
@@ -44,6 +44,16 @@ namespace ClkdUI.Layouts
         {
             return Components[row, column];
         }
+
+        public void RemoveGuiComponent(int row, int column)
+        {
+            if (Components[row, column] != null)
+            {
+                Components[row, column].Remove();
+                Components[row, column] = null;
+            }
+        }
+
         public override IEnumerator<AbstractGuiComponent> GetEnumerator()
         {
             return Components.Cast<AbstractGuiComponent>().GetEnumerator();

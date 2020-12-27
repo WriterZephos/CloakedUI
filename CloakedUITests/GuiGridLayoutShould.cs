@@ -14,15 +14,15 @@ namespace CloakedUITests
             var nestedLayout = new GuiGridLayout(10, 10);
             ColoredRectangle rect = new ColoredRectangle(50f, 50f, Color.Aqua);
             var nested = new GuiContainer(nestedLayout);
-            nested.GetLayout<GuiGridLayout>().AddComponent(0, 0, rect);
-            layout.AddComponent(0, 0, nested);
+            nested.GetLayout<GuiGridLayout>().AddGuiComponent(0, 0, rect);
+            layout.AddGuiComponent(0, 0, nested);
         }
 
         [Fact]
         public void AddComponentCorrectly()
         {
             ColoredRectangle rect = new ColoredRectangle(50f, 50f, Color.Aqua);
-            layout.AddComponent(1, 0, rect);
+            layout.AddGuiComponent(1, 0, rect);
             Assert.Equal(layout.Components[1, 0], rect);
         }
 

@@ -15,6 +15,16 @@ namespace ClkdUI.Main
     {
         public Guid Guid { get; set; }
         public GuiCoordinate GuiCoordinate { get; set; }
+        private bool _positionInitialized = false;
+        private Lazy<GuiInput> _guiInput;
+        private bool _inputInitialized = false;
+        public GuiInput Input
+        {
+            get
+            {
+                return _guiInput.Value;
+            }
+        }
         public float LeftMargin { get; set; }
         public float RightMargin { get; set; }
         public float TopMargin { get; set; }
@@ -79,29 +89,51 @@ namespace ClkdUI.Main
         public AbstractGuiComponent() : base(canGetRenderables: true, canUpdate: true)
         {
             GuiCoordinate = new GuiCoordinate(child: this);
+            _guiInput = new Lazy<GuiInput>(() => { return new GuiInput(this); });
             Guid = Guid.NewGuid();
         }
 
         public abstract override List<Renderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null);
 
-        public abstract override void Update(GameTime gameTime);
 
-        public virtual void UpdatePosition(GuiContainer parent, Vector2 offsets)
+        public abstract override void Update(GameTime gameTime);
+        internal void UpdateInternal(GameTime gameTime)
         {
+            if (_guiInput.IsValueCreated && !_inputInitialized && _positionInitialized)
+            {
+                GetRootPane().GuiInputManager.AddGuiInput(Input);
+                _inputInitialized = true;
+            }
+            Update(gameTime);
+        }
+
+        internal virtual void UpdatePosition(GuiContainer parent, Vector2 offsets)
+        {
+            if (!_positionInitialized) _positionInitialized = true;
             GuiCoordinate.UpdateCoordinate(
                 parent: parent,
                 offsets: offsets);
         }
 
-        public virtual void UpdatePosition(GuiCoordinate guiCoordinate, Vector2 offsets)
+        internal virtual void UpdatePosition(GuiCoordinate guiCoordinate, Vector2 offsets)
         {
+            if (!_positionInitialized) _positionInitialized = true;
             GuiCoordinate.UpdateCoordinate(
                 guiCoordinate: guiCoordinate,
                 offsets: offsets);
         }
 
+        internal void Remove()
+        {
+            if (_inputInitialized)
+            {
+                GetRootPane().GuiInputManager.RemoveGuiInput(Input);
+            }
+        }
+
         private GuiPane GetRootPane()
         {
+            if (!_positionInitialized) throw new OrphanedGuiComponentException("This component has not been positioned by a parent, and therefore has no reference to a parent.");
             GuiCoordinate currentCoordinate = GuiCoordinate;
             while (currentCoordinate.Parent != null)
             {

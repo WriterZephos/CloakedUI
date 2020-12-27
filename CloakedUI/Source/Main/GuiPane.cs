@@ -11,6 +11,7 @@ namespace ClkdUI.Main
     public class GuiPane : AbstractGuiComponent
     {
         public GuiContainer RootContainer { get; set; }
+        public GuiInputManager GuiInputManager { get; private set; }
         private Vector2 _position;
         public Vector2 Position
         {
@@ -37,7 +38,7 @@ namespace ClkdUI.Main
         public override void Update(GameTime gameTime)
         {
             if (!Initialized) return;
-            RootContainer.Update(gameTime);
+            RootContainer.UpdateInternal(gameTime);
         }
 
         public void Initialize()
@@ -45,6 +46,7 @@ namespace ClkdUI.Main
             GuiCoordinate = BuildGuiCoordinate(Cloaked.GraphicsDeviceManager.GraphicsDevice.Viewport.Bounds, Position);
             SetRootGuiCoordinate();
             Initialized = true;
+            GuiInputManager = new GuiInputManager();
         }
 
         private void SetRootGuiCoordinate()
