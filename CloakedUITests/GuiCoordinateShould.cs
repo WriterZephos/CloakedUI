@@ -1,9 +1,9 @@
 using Microsoft.Xna.Framework;
 
 using Clkd.Assets;
-using Clkd.GUI;
 
 using Xunit;
+using ClkdUI.Assets;
 
 namespace CloakedUITests
 {

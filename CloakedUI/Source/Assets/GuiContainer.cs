@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Clkd.Assets;
-using Clkd.GUI.Interfaces;
-using Clkd.Main;
+using ClkdUI.Layouts;
+using ClkdUI.Main;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
-namespace Clkd.GUI
+namespace ClkdUI.Assets
 {
     public class GuiContainer : AbstractGuiComponent
     {

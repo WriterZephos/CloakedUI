@@ -5,10 +5,11 @@ using Microsoft.Xna.Framework;
 
 using Clkd.Assets;
 using Clkd.Main;
-using Clkd.State;
-using CloakedUI.Exceptions;
+using ClkdUI.Assets;
+using ClkdUI.Exceptions;
+using ClkdUI.Main;
 
-namespace Clkd.GUI
+namespace ClkdUI.Main
 {
     public abstract class AbstractGuiComponent : AbstractComponent
     {

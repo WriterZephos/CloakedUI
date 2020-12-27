@@ -1,6 +1,6 @@
 using System;
 
-namespace CloakedUI.Exceptions
+namespace ClkdUI.Exceptions
 {
     [Serializable()]
     public class OrphanedGuiComponentException : System.Exception

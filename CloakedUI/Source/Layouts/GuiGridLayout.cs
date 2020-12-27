@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Clkd.GUI.Interfaces;
+using ClkdUI.Assets;
+using ClkdUI.Main;
 
 [assembly: InternalsVisibleTo("CloakedUITests")]
-namespace Clkd.GUI.Layouts
+namespace ClkdUI.Layouts
 {
     public class GuiGridLayout : AbstractGuiLayout
     {

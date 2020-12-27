@@ -4,8 +4,9 @@ using Microsoft.Xna.Framework;
 
 using Clkd.Assets;
 using Clkd.Main;
+using ClkdUI.Assets;
 
-namespace Clkd.GUI
+namespace ClkdUI.Main
 {
     public class GuiPane : AbstractGuiComponent
     {

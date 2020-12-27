@@ -1,8 +1,9 @@
 using Clkd.Assets;
 using Clkd.Main;
+using ClkdUI.Main;
 using Microsoft.Xna.Framework;
 
-namespace Clkd.GUI
+namespace ClkdUI.Assets
 {
     //TODO: add support for limiting the size of a component and setting overflow behavior
     public class GuiCoordinate

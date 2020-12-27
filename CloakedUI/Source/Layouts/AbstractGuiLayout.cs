@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using ClkdUI.Assets;
+using ClkdUI.Main;
 
-namespace Clkd.GUI.Interfaces
+namespace ClkdUI.Layouts
 {
     public abstract class AbstractGuiLayout : IEnumerable<AbstractGuiComponent>
     {

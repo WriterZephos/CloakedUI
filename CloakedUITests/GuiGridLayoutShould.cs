@@ -1,5 +1,5 @@
-using Clkd.GUI;
-using Clkd.GUI.Layouts;
+using ClkdUI.Assets;
+using ClkdUI.Layouts;
 using Microsoft.Xna.Framework;
 using Xunit;
 
