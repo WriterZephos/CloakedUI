@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using ClkdUI.Assets;
 using ClkdUI.Main;
+using Microsoft.Xna.Framework;
 
 [assembly: InternalsVisibleTo("CloakedUITests")]
 namespace ClkdUI.Layouts
@@ -108,8 +109,7 @@ namespace ClkdUI.Layouts
         {
             childComponent.UpdatePosition(
                 parent: parent,
-                xOffset: xOffset,
-                yOffset: yOffset);
+                new Vector2(xOffset, yOffset));
 
         }
 

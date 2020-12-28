@@ -49,12 +49,16 @@ namespace ClkdUI.Main
 
         private void SetRootGuiCoordinate()
         {
-            RootContainer.UpdatePosition(GuiCoordinate, 0f, 0f);
+            RootContainer.UpdatePosition(GuiCoordinate, Vector2.Zero);
         }
 
         private GuiCoordinate BuildGuiCoordinate(Rectangle bounds, Vector2 position)
         {
-            return new GuiCoordinate(bounds.X, bounds.Y, bounds.Width, bounds.Height, position.X, position.Y, this);
+            return new GuiCoordinate(
+                parentPosition: new Vector2(bounds.X, bounds.Y),
+                parentDimensions: new Vector2(bounds.Width, bounds.Height),
+                offsets: new Vector2(position.X, position.Y),
+                child: this);
         }
     }
 }

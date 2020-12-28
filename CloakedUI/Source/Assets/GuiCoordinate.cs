@@ -21,67 +21,36 @@ namespace ClkdUI.Assets
         internal AbstractGuiComponent Child { get; set; }
 
         internal GuiCoordinate(
-            float parentRealX,
-            float parentRealY,
-            float parentRealWidth,
-            float parentRealHeight,
-            float xOffset,
-            float yOffset,
-            AbstractGuiComponent child)
+            AbstractGuiComponent child,
+            Vector2 parentPosition = default(Vector2),
+            Vector2 parentDimensions = default(Vector2),
+            Vector2 offsets = default(Vector2))
         {
             Parent = null;
             Child = child;
             UpdateCoordinateValues(
-                parentRealX: parentRealX,
-                parentRealY: parentRealY,
-                parentRealWidth: parentRealWidth,
-                parentRealHeight: parentRealHeight,
-                xOffset: xOffset,
-                yOffset: yOffset);
+                parentPosition: parentPosition,
+                parentDimensions: parentDimensions,
+                offsets: offsets);
             Child = child;
         }
 
-        internal RenderableCoordinate GetRenerableCoordinate()
-        {
-            return new RenderableCoordinate((int)Position.X, (int)Position.Y, 0, (int)Dimensions.X, (int)Dimensions.Y);
-        }
-
-        internal void UpdateCoordinate(float parentRealX, float parentRealY, float parentRealWidth, float parentRealHeight, float xOffset, float yOffset)
+        internal void UpdateCoordinate(GuiCoordinate guiCoordinate, Vector2 offsets)
         {
             Parent = null;
             UpdateCoordinateValues(
-                parentRealX: parentRealX,
-                parentRealY: parentRealY,
-                parentRealWidth: parentRealWidth,
-                parentRealHeight: parentRealHeight,
-                xOffset: xOffset,
-                yOffset: yOffset);
+                parentPosition: guiCoordinate.Position,
+                parentDimensions: guiCoordinate.Dimensions,
+                offsets: offsets);
         }
 
-        internal void UpdateCoordinate(GuiCoordinate guiCoordinate, float xOffset, float yOffset)
-        {
-            Parent = null;
-            UpdateCoordinateValues(
-                parentRealX: guiCoordinate.Position.X,
-                parentRealY: guiCoordinate.Position.Y,
-                parentRealWidth: guiCoordinate.Dimensions.X,
-                parentRealHeight: guiCoordinate.Dimensions.Y,
-                xOffset: xOffset,
-                yOffset: yOffset);
-        }
-
-
-
-        internal void UpdateCoordinate(GuiContainer parent, float xOffset, float yOffset)
+        internal void UpdateCoordinate(GuiContainer parent, Vector2 offsets)
         {
             Parent = parent;
             UpdateCoordinateValues(
-                parentRealX: parent.GuiCoordinate.Position.X,
-                parentRealY: parent.GuiCoordinate.Position.Y,
-                parentRealWidth: parent.GuiCoordinate.Dimensions.X,
-                parentRealHeight: parent.GuiCoordinate.Dimensions.Y,
-                xOffset: xOffset,
-                yOffset: yOffset);
+                parentPosition: parent.GuiCoordinate.Position,
+                parentDimensions: parent.GuiCoordinate.Dimensions,
+                offsets: offsets);
         }
 
         internal RenderableCoordinate GetRenderableCoordinate()
@@ -93,14 +62,6 @@ namespace ClkdUI.Assets
                 width: (int)Dimensions.X,
                 height: (int)Dimensions.Y,
                 isOffset: false);
-        }
-
-        private void UpdateCoordinateValues(float parentRealX, float parentRealY, float parentRealWidth, float parentRealHeight, float xOffset, float yOffset)
-        {
-            UpdateCoordinateValues(
-                parentPosition: new Vector2(parentRealX, parentRealY),
-                parentDimensions: new Vector2(parentRealWidth, parentRealHeight),
-                offsets: new Vector2(xOffset, yOffset));
         }
 
         private void UpdateCoordinateValues(Vector2 parentPosition, Vector2 parentDimensions, Vector2 offsets)

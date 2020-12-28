@@ -78,7 +78,7 @@ namespace ClkdUI.Main
 
         public AbstractGuiComponent() : base(canGetRenderables: true, canUpdate: true)
         {
-            GuiCoordinate = new GuiCoordinate(0, 0, 0, 0, 0, 0, this);
+            GuiCoordinate = new GuiCoordinate(child: this);
             Guid = Guid.NewGuid();
         }
 
@@ -86,20 +86,18 @@ namespace ClkdUI.Main
 
         public abstract override void Update(GameTime gameTime);
 
-        public virtual void UpdatePosition(GuiContainer parent, float xOffset, float yOffset)
+        public virtual void UpdatePosition(GuiContainer parent, Vector2 offsets)
         {
             GuiCoordinate.UpdateCoordinate(
                 parent: parent,
-                xOffset: xOffset,
-                yOffset: yOffset);
+                offsets: offsets);
         }
 
-        public virtual void UpdatePosition(GuiCoordinate guiCoordinate, float xOffset, float yOffset)
+        public virtual void UpdatePosition(GuiCoordinate guiCoordinate, Vector2 offsets)
         {
             GuiCoordinate.UpdateCoordinate(
                 guiCoordinate: guiCoordinate,
-                xOffset: xOffset,
-                yOffset: yOffset);
+                offsets: offsets);
         }
 
         private GuiPane GetRootPane()

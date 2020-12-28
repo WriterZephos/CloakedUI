@@ -20,7 +20,11 @@ namespace CloakedUITests
         public void CalculateRealWidth(float widthProperty, float parentWidth, float expectedWidth)
         {
             ColoredRectangle rect = new ColoredRectangle(widthProperty, 50f, Color.Aqua);
-            GuiCoordinate sut = new GuiCoordinate(0f, 0f, parentWidth, 100f, 0f, 0f, rect);
+            GuiCoordinate sut = new GuiCoordinate(
+                child: rect,
+                parentPosition: new Vector2(0f, 0f),
+                parentDimensions: new Vector2(parentWidth, 100f),
+                offsets: new Vector2(0f, 0f));
             Assert.Equal(sut.Dimensions.X, expectedWidth);
         }
 
@@ -35,7 +39,10 @@ namespace CloakedUITests
         public void CalculateRealHeight(float heightProperty, float parentHeight, float expectedHeight)
         {
             ColoredRectangle rect = new ColoredRectangle(50f, heightProperty, Color.Aqua);
-            GuiCoordinate sut = new GuiCoordinate(0f, 0f, 100f, parentHeight, 0f, 0f, rect);
+            GuiCoordinate sut = new GuiCoordinate(
+                child: rect,
+                parentPosition: new Vector2(0f, 0f),
+                parentDimensions: new Vector2(100f, parentHeight));
             Assert.Equal(sut.Dimensions.Y, expectedHeight);
         }
 
@@ -46,7 +53,11 @@ namespace CloakedUITests
         public void CalculateRealX(float parentRealX, float xOffset, float expectedRealX)
         {
             ColoredRectangle rect = new ColoredRectangle(50f, 50f, Color.Aqua);
-            GuiCoordinate sut = new GuiCoordinate(parentRealX, 0f, 100f, 100f, xOffset, 0f, rect);
+            GuiCoordinate sut = new GuiCoordinate(
+                child: rect,
+                parentPosition: new Vector2(parentRealX, 0f),
+                parentDimensions: new Vector2(100f, 100f),
+                offsets: new Vector2(xOffset, 0f));
             Assert.Equal(sut.Position.X, expectedRealX);
         }
 
@@ -57,7 +68,11 @@ namespace CloakedUITests
         public void CalculateRealY(float parentRealY, float yOffset, float expectedRealY)
         {
             ColoredRectangle rect = new ColoredRectangle(50f, 50f, Color.Aqua);
-            GuiCoordinate sut = new GuiCoordinate(0f, parentRealY, 100f, 100f, 0f, yOffset, rect);
+            GuiCoordinate sut = new GuiCoordinate(
+                child: rect,
+                parentPosition: new Vector2(0f, parentRealY),
+                parentDimensions: new Vector2(100f, 100f),
+                offsets: new Vector2(0f, yOffset));
             Assert.Equal(sut.Position.Y, expectedRealY);
         }
 
@@ -80,7 +95,11 @@ namespace CloakedUITests
         )
         {
             ColoredRectangle rect = new ColoredRectangle(widthProperty, heightProperty, Color.Aqua);
-            GuiCoordinate sut = new GuiCoordinate(parentRealX, parentRealY, parentWidth, parentHeight, xOffset, yOffset, rect);
+            GuiCoordinate sut = new GuiCoordinate(
+                child: rect,
+                parentPosition: new Vector2(parentRealX, parentRealY),
+                parentDimensions: new Vector2(parentWidth, parentHeight),
+                offsets: new Vector2(xOffset, yOffset));
             RenderableCoordinate coord = sut.GetRenderableCoordinate();
             Assert.Equal(coord.X, expectedX);
             Assert.Equal(coord.Y, expectedY);
