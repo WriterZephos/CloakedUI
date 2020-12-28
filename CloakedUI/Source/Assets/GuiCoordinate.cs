@@ -8,38 +8,19 @@ namespace ClkdUI.Assets
     //TODO: add support for limiting the size of a component and setting overflow behavior
     public class GuiCoordinate
     {
-        public float ParentRealX { get; set; }
-        public float ParentRealY { get; set; }
-        public float ParentRealWidth { get; set; }
-        public float ParentRealHeight { get; set; }
-        public float XOffset { get; set; }
-        public float YOffset { get; set; }
-        public float MaxWidth { get; set; }
-        public float MaxHeight { get; set; }
-        public float RealX
-        {
-            get => CalculateRealX();
-        }
+        internal Vector2 ParentPosition { get; set; }
+        internal Vector2 ParentDimensions { get; set; }
+        internal Vector2 Offsets { get; set; }
+        internal Vector2 MaxDimensions { get; set; }
+        internal float MaxWidth { get; set; }
+        internal float MaxHeight { get; set; }
+        public Vector2 Position { get; set; }
+        internal Vector2 Dimensions { get; set; }
+        public Rectangle Bounds { get; private set; }
+        internal GuiContainer Parent { get; set; }
+        internal AbstractGuiComponent Child { get; set; }
 
-        public float RealY
-        {
-            get => CalculateRealY();
-        }
-
-        public float RealWidth
-        {
-            get => CalculateRealWidth();
-        }
-
-        public float RealHeight
-        {
-            get => CalculateRealHeight();
-        }
-
-        public GuiContainer Parent { get; set; }
-        public AbstractGuiComponent Child { get; set; }
-
-        public GuiCoordinate(
+        internal GuiCoordinate(
             float parentRealX,
             float parentRealY,
             float parentRealWidth,
@@ -60,12 +41,12 @@ namespace ClkdUI.Assets
             Child = child;
         }
 
-        public RenderableCoordinate GetRenerableCoordinate()
+        internal RenderableCoordinate GetRenerableCoordinate()
         {
-            return new RenderableCoordinate((int)RealX, (int)RealY, 0, (int)RealWidth, (int)RealHeight);
+            return new RenderableCoordinate((int)Position.X, (int)Position.Y, 0, (int)Dimensions.X, (int)Dimensions.Y);
         }
 
-        public void UpdateCoordinate(float parentRealX, float parentRealY, float parentRealWidth, float parentRealHeight, float xOffset, float yOffset)
+        internal void UpdateCoordinate(float parentRealX, float parentRealY, float parentRealWidth, float parentRealHeight, float xOffset, float yOffset)
         {
             Parent = null;
             UpdateCoordinateValues(
@@ -77,69 +58,79 @@ namespace ClkdUI.Assets
                 yOffset: yOffset);
         }
 
-        public void UpdateCoordinate(GuiCoordinate guiCoordinate, float xOffset, float yOffset)
+        internal void UpdateCoordinate(GuiCoordinate guiCoordinate, float xOffset, float yOffset)
         {
             Parent = null;
             UpdateCoordinateValues(
-                parentRealX: guiCoordinate.RealX,
-                parentRealY: guiCoordinate.RealY,
-                parentRealWidth: guiCoordinate.RealWidth,
-                parentRealHeight: guiCoordinate.RealHeight,
+                parentRealX: guiCoordinate.Position.X,
+                parentRealY: guiCoordinate.Position.Y,
+                parentRealWidth: guiCoordinate.Dimensions.X,
+                parentRealHeight: guiCoordinate.Dimensions.Y,
                 xOffset: xOffset,
                 yOffset: yOffset);
+        }
+
+
+
+        internal void UpdateCoordinate(GuiContainer parent, float xOffset, float yOffset)
+        {
+            Parent = parent;
+            UpdateCoordinateValues(
+                parentRealX: parent.GuiCoordinate.Position.X,
+                parentRealY: parent.GuiCoordinate.Position.Y,
+                parentRealWidth: parent.GuiCoordinate.Dimensions.X,
+                parentRealHeight: parent.GuiCoordinate.Dimensions.Y,
+                xOffset: xOffset,
+                yOffset: yOffset);
+        }
+
+        internal RenderableCoordinate GetRenderableCoordinate()
+        {
+            return new RenderableCoordinate(
+                x: (int)Position.X,
+                y: (int)Position.Y,
+                z: 1,
+                width: (int)Dimensions.X,
+                height: (int)Dimensions.Y,
+                isOffset: false);
         }
 
         private void UpdateCoordinateValues(float parentRealX, float parentRealY, float parentRealWidth, float parentRealHeight, float xOffset, float yOffset)
         {
-            ParentRealX = parentRealX;
-            ParentRealY = parentRealY;
-            ParentRealWidth = parentRealWidth;
-            ParentRealHeight = parentRealHeight;
-            XOffset = xOffset;
-            YOffset = yOffset;
-        }
-
-        public void UpdateCoordinate(GuiContainer parent, float xOffset, float yOffset)
-        {
-            Parent = parent;
             UpdateCoordinateValues(
-                parentRealX: parent.GuiCoordinate.RealX,
-                parentRealY: parent.GuiCoordinate.RealY,
-                parentRealWidth: parent.GuiCoordinate.RealWidth,
-                parentRealHeight: parent.GuiCoordinate.RealHeight,
-                xOffset: xOffset,
-                yOffset: yOffset);
+                parentPosition: new Vector2(parentRealX, parentRealY),
+                parentDimensions: new Vector2(parentRealWidth, parentRealHeight),
+                offsets: new Vector2(xOffset, yOffset));
         }
 
-        public RenderableCoordinate GetRenderableCoordinate()
+        private void UpdateCoordinateValues(Vector2 parentPosition, Vector2 parentDimensions, Vector2 offsets)
         {
-            return new RenderableCoordinate(
-                x: (int)CalculateRealX(),
-                y: (int)CalculateRealY(),
-                z: 1,
-                width: (int)CalculateRealWidth(),
-                height: (int)CalculateRealHeight(),
-                isOffset: false);
+            ParentPosition = parentPosition;
+            ParentDimensions = parentDimensions;
+            Offsets = offsets;
+            Position = new Vector2(CalculateRealX(), CalculateRealY());
+            Dimensions = new Vector2(CalculateRealWidth(), CalculateRealHeight());
+            Bounds = new Rectangle((int)Position.X, (int)Position.Y, (int)Dimensions.X, (int)Dimensions.Y);
         }
 
         private float CalculateRealWidth()
         {
-            return Child.HasRelativeWidth ? ParentRealWidth * Child.Width : Child.Width;
+            return Child.HasRelativeWidth ? ParentDimensions.X * Child.Width : Child.Width;
         }
 
         private float CalculateRealHeight()
         {
-            return Child.HasRelativeHeight ? ParentRealHeight * Child.Height : Child.Height;
+            return Child.HasRelativeHeight ? ParentDimensions.Y * Child.Height : Child.Height;
         }
 
         private float CalculateRealY()
         {
-            return ParentRealY + YOffset;
+            return (ParentPosition + Offsets).Y;
         }
 
         private float CalculateRealX()
         {
-            return ParentRealX + XOffset;
+            return (ParentPosition + Offsets).X;
         }
     }
 }

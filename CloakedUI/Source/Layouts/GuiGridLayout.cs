@@ -25,7 +25,7 @@ namespace ClkdUI.Layouts
             Components = new AbstractGuiComponent[Rows, Columns];
         }
 
-        public void AddComponent(int row, int column, AbstractGuiComponent component)
+        public GuiGridLayout AddComponent(int row, int column, AbstractGuiComponent component)
         {
             if (Components[row, column] == null)
             {
@@ -36,6 +36,7 @@ namespace ClkdUI.Layouts
             {
                 throw new ArgumentException("A component already exists in the specified location.");
             }
+            return this;
         }
 
         public AbstractGuiComponent GetGuiComponent(int row, int column)

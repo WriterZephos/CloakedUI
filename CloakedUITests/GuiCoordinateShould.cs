@@ -21,7 +21,7 @@ namespace CloakedUITests
         {
             ColoredRectangle rect = new ColoredRectangle(widthProperty, 50f, Color.Aqua);
             GuiCoordinate sut = new GuiCoordinate(0f, 0f, parentWidth, 100f, 0f, 0f, rect);
-            Assert.Equal(sut.RealWidth, expectedWidth);
+            Assert.Equal(sut.Dimensions.X, expectedWidth);
         }
 
         [Theory]
@@ -36,7 +36,7 @@ namespace CloakedUITests
         {
             ColoredRectangle rect = new ColoredRectangle(50f, heightProperty, Color.Aqua);
             GuiCoordinate sut = new GuiCoordinate(0f, 0f, 100f, parentHeight, 0f, 0f, rect);
-            Assert.Equal(sut.RealHeight, expectedHeight);
+            Assert.Equal(sut.Dimensions.Y, expectedHeight);
         }
 
         [Theory]
@@ -47,7 +47,7 @@ namespace CloakedUITests
         {
             ColoredRectangle rect = new ColoredRectangle(50f, 50f, Color.Aqua);
             GuiCoordinate sut = new GuiCoordinate(parentRealX, 0f, 100f, 100f, xOffset, 0f, rect);
-            Assert.Equal(sut.RealX, expectedRealX);
+            Assert.Equal(sut.Position.X, expectedRealX);
         }
 
         [Theory]
@@ -58,7 +58,7 @@ namespace CloakedUITests
         {
             ColoredRectangle rect = new ColoredRectangle(50f, 50f, Color.Aqua);
             GuiCoordinate sut = new GuiCoordinate(0f, parentRealY, 100f, 100f, 0f, yOffset, rect);
-            Assert.Equal(sut.RealY, expectedRealY);
+            Assert.Equal(sut.Position.Y, expectedRealY);
         }
 
         [Theory]

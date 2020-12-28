@@ -14,12 +14,10 @@ namespace ClkdUI.Main
         private Vector2 _position;
         public Vector2 Position
         {
-            get => _position;
+            get => GuiCoordinate.Offsets;
             set
             {
-                GuiCoordinate.XOffset = value.X;
-                GuiCoordinate.YOffset = value.Y;
-                _position = value;
+                GuiCoordinate.Offsets = value;
             }
         }
         public bool Initialized { get; private set; }

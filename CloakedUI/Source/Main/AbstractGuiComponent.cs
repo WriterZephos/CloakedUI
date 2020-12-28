@@ -67,13 +67,13 @@ namespace ClkdUI.Main
                 }
             }
         }
-        public float RealWidth
+        internal float RealWidth
         {
-            get => GuiCoordinate.RealWidth;
+            get => GuiCoordinate.Dimensions.X;
         }
-        public float RealHeight
+        internal float RealHeight
         {
-            get => GuiCoordinate.RealHeight;
+            get => GuiCoordinate.Dimensions.Y;
         }
 
         public AbstractGuiComponent() : base(canGetRenderables: true, canUpdate: true)
