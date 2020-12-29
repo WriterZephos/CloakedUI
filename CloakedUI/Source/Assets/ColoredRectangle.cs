@@ -10,14 +10,22 @@ namespace ClkdUI.Assets
     //called TexturedRectangle
     public class ColoredRectangle : AbstractGuiComponent
     {
-        public Color Color { get; set; }
+        private Color _color;
+        public Color Color
+        {
+            get => _color;
+            set
+            {
+                _color = value;
+                Sprite = new Sprite(_color);
+            }
+        }
         public Sprite Sprite { get; set; }
         public ColoredRectangle(float width, float height, Color color) : base()
         {
             Width = width;
             Height = height;
             Color = color;
-            Sprite = new Sprite(color);
         }
         public override List<Renderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null)
         {

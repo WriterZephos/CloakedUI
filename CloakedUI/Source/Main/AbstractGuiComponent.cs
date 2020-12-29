@@ -8,6 +8,7 @@ using Clkd.Main;
 using ClkdUI.Assets;
 using ClkdUI.Exceptions;
 using ClkdUI.Main;
+using System.Linq;
 
 namespace ClkdUI.Main
 {
@@ -15,7 +16,7 @@ namespace ClkdUI.Main
     {
         public Guid Guid { get; set; }
         public GuiCoordinate GuiCoordinate { get; set; }
-        private bool _positionInitialized = false;
+        protected bool _positionInitialized = false;
         private Lazy<GuiInput> _guiInput;
         private bool _inputInitialized = false;
         public GuiInput Input
@@ -94,10 +95,9 @@ namespace ClkdUI.Main
             }
             internal set
             {
-                if (_inputInitialized)
-                {
-                    Input.Focused = value;
-                }
+
+                Input.Focused = value;
+
             }
         }
 
@@ -131,9 +131,9 @@ namespace ClkdUI.Main
             Update(gameTime);
         }
 
-        // Because GuiContainer needs to override this method, it is
-        // virtual and internal. A proxy method is then provided
-        // to expost unfocusing to external use.
+        // Because some internal classes need to override this 
+        // method, it is virtual and internal. A proxy method is then
+        // provided to expost unfocusing to external use.
         internal virtual void UnfocusInternal()
         {
             Focused = false;
@@ -144,16 +144,46 @@ namespace ClkdUI.Main
             UnfocusInternal();
         }
 
-        public virtual void Focus()
+        // Because some internal classes need to override this 
+        // method, it is virtual and internal. A proxy method is then
+        // provided to expost unfocusing to external use.
+        internal virtual void FocusInternal()
         {
-            Focused = true;
-            foreach (AbstractGuiComponent guiComponent in GetAncestors())
+            List<AbstractGuiComponent> focused = GetHierarchy();
+            IEnumerable<AbstractGuiComponent> unfocused = GetRootPane().GetFocusedInternal().Except(focused);
+            foreach (AbstractGuiComponent guiComponent in unfocused)
+            {
+                guiComponent.Focused = false;
+            }
+
+            foreach (AbstractGuiComponent guiComponent in focused)
             {
                 guiComponent.Focused = true;
             }
         }
 
-        internal virtual void UpdatePosition(GuiContainer parent, Vector2 offsets)
+        public void Focus()
+        {
+            FocusInternal();
+        }
+
+        public List<AbstractGuiComponent> GetHierarchy()
+        {
+            List<AbstractGuiComponent> components = new List<AbstractGuiComponent>();
+            components.Add(this);
+            if (!_positionInitialized)
+            {
+                GuiCoordinate currentCoordinate = GuiCoordinate;
+                while (currentCoordinate.Parent != null)
+                {
+                    components.Add(currentCoordinate.Parent);
+                    currentCoordinate = currentCoordinate.Parent.GuiCoordinate;
+                }
+            }
+            return components;
+        }
+
+        internal virtual void UpdatePosition(AbstractGuiComponent parent, Vector2 offsets)
         {
             if (!_positionInitialized) _positionInitialized = true;
             GuiCoordinate.UpdateCoordinate(
@@ -192,22 +222,6 @@ namespace ClkdUI.Main
             }
 
             throw new OrphanedGuiComponentException("Could not reach a GuiPane instance by traversing up the hierarchy.");
-        }
-
-        private List<AbstractGuiComponent> GetAncestors()
-        {
-            List<AbstractGuiComponent> components = new List<AbstractGuiComponent>();
-            components.Add(this);
-            if (!_positionInitialized)
-            {
-                GuiCoordinate currentCoordinate = GuiCoordinate;
-                while (currentCoordinate.Parent != null)
-                {
-                    components.Add(currentCoordinate.Parent);
-                    currentCoordinate = currentCoordinate.Parent.GuiCoordinate;
-                }
-            }
-            return components;
         }
     }
 }

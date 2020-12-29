@@ -18,7 +18,7 @@ namespace ClkdUI.Assets
         public int ZIndex { get; set; }
         internal Vector2 Dimensions { get; set; }
         public Rectangle Bounds { get; private set; }
-        internal GuiContainer Parent { get; set; }
+        internal AbstractGuiComponent Parent { get; set; }
         internal AbstractGuiComponent Child { get; set; }
 
         internal GuiCoordinate(
@@ -35,7 +35,6 @@ namespace ClkdUI.Assets
                 parentDimensions: parentDimensions,
                 offsets: offsets,
                 zIndex: zIndex);
-            Child = child;
         }
 
         internal void UpdateCoordinate(GuiCoordinate guiCoordinate, Vector2 offsets, int? zIndex = null)
@@ -48,7 +47,7 @@ namespace ClkdUI.Assets
                 zIndex: zIndex);
         }
 
-        internal void UpdateCoordinate(GuiContainer parent, Vector2 offsets, int? zIndex = null)
+        internal void UpdateCoordinate(AbstractGuiComponent parent, Vector2 offsets, int? zIndex = null)
         {
             Parent = parent;
             UpdateCoordinateValues(

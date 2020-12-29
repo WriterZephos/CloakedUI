@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Clkd.Assets;
 using Clkd.Main;
 using ClkdUI.Assets;
+using System.Linq;
 
 namespace ClkdUI.Main
 {
@@ -12,7 +13,6 @@ namespace ClkdUI.Main
     {
         public GuiContainer RootContainer { get; set; }
         public GuiInputManager GuiInputManager { get; private set; }
-        private Vector2 _position;
         public Vector2 Position
         {
             get => GuiCoordinate.Offsets;
@@ -41,12 +41,22 @@ namespace ClkdUI.Main
             RootContainer.UpdateInternal(gameTime);
         }
 
-        public void Initialize()
+        public void Initialize(GameContext gameContext)
         {
-            GuiCoordinate = BuildGuiCoordinate(Cloaked.GraphicsDeviceManager.GraphicsDevice.Viewport.Bounds, Position);
             SetRootGuiCoordinate();
+            RootContainer.RecalculateChildren();
+            GuiInputManager = new GuiInputManager(gameContext);
             Initialized = true;
-            GuiInputManager = new GuiInputManager();
+        }
+
+        internal IEnumerable<AbstractGuiComponent> GetFocusedInternal()
+        {
+            return RootContainer.Layout.Where((guiComponent) => { return guiComponent?.Input.Focused ?? false; });
+        }
+
+        public List<AbstractGuiComponent> GetFocused()
+        {
+            return GetFocusedInternal().ToList();
         }
 
         internal override sealed void UnfocusInternal()
@@ -57,11 +67,18 @@ namespace ClkdUI.Main
 
         private void SetRootGuiCoordinate()
         {
-            RootContainer.UpdatePosition(GuiCoordinate, Vector2.Zero);
+            GuiCoordinate = BuildGuiCoordinate(Cloaked.GraphicsDeviceManager.GraphicsDevice.Viewport.Bounds, Position);
+            RootContainer.Width = GuiCoordinate.Dimensions.X;
+            RootContainer.Height = GuiCoordinate.Dimensions.Y;
+            RootContainer.UpdatePosition(
+                parent: this,
+                offsets: this.GuiCoordinate.Offsets);
         }
 
         private GuiCoordinate BuildGuiCoordinate(Rectangle bounds, Vector2 position)
         {
+            this.Width = bounds.Width;
+            this.Height = bounds.Height;
             return new GuiCoordinate(
                 parentPosition: new Vector2(bounds.X, bounds.Y),
                 parentDimensions: new Vector2(bounds.Width, bounds.Height),

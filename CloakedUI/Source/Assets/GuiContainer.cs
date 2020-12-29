@@ -63,7 +63,7 @@ namespace ClkdUI.Assets
             return Layout as T;
         }
 
-        public void RecalculateChildren()
+        internal void RecalculateChildren()
         {
             Layout.RecalculateChildren(this);
         }
