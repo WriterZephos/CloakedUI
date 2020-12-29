@@ -33,14 +33,28 @@ namespace ClkdUI.Assets
 
         public override void Update(GameTime gameTime)
         {
+            return;
+        }
+
+        internal override sealed void UpdateInternal(GameTime gameTime)
+        {
             if (Layout.Dirty)
             {
                 RecalculateChildren();
             }
-
+            base.UpdateInternal(gameTime);
             foreach (AbstractGuiComponent c in Layout)
             {
                 if (c != null) c.UpdateInternal(gameTime);
+            }
+        }
+
+        internal override sealed void UnfocusInternal()
+        {
+            base.UnfocusInternal();
+            foreach (AbstractGuiComponent c in Layout)
+            {
+                if (c != null) c.Unfocus();
             }
         }
 

@@ -77,6 +77,30 @@ namespace ClkdUI.Main
                 }
             }
         }
+        public int ZIndex
+        {
+            get => GuiCoordinate.ZIndex;
+            set => GuiCoordinate.ZIndex = value;
+        }
+        public bool Focused
+        {
+            get
+            {
+                if (_inputInitialized)
+                {
+                    return Input.Focused;
+                }
+                return false;
+            }
+            internal set
+            {
+                if (_inputInitialized)
+                {
+                    Input.Focused = value;
+                }
+            }
+        }
+
         internal float RealWidth
         {
             get => GuiCoordinate.Dimensions.X;
@@ -97,7 +121,7 @@ namespace ClkdUI.Main
 
 
         public abstract override void Update(GameTime gameTime);
-        internal void UpdateInternal(GameTime gameTime)
+        internal virtual void UpdateInternal(GameTime gameTime)
         {
             if (_guiInput.IsValueCreated && !_inputInitialized && _positionInitialized)
             {
@@ -105,6 +129,28 @@ namespace ClkdUI.Main
                 _inputInitialized = true;
             }
             Update(gameTime);
+        }
+
+        // Because GuiContainer needs to override this method, it is
+        // virtual and internal. A proxy method is then provided
+        // to expost unfocusing to external use.
+        internal virtual void UnfocusInternal()
+        {
+            Focused = false;
+        }
+
+        public void Unfocus()
+        {
+            UnfocusInternal();
+        }
+
+        public virtual void Focus()
+        {
+            Focused = true;
+            foreach (AbstractGuiComponent guiComponent in GetAncestors())
+            {
+                guiComponent.Focused = true;
+            }
         }
 
         internal virtual void UpdatePosition(GuiContainer parent, Vector2 offsets)
@@ -146,6 +192,22 @@ namespace ClkdUI.Main
             }
 
             throw new OrphanedGuiComponentException("Could not reach a GuiPane instance by traversing up the hierarchy.");
+        }
+
+        private List<AbstractGuiComponent> GetAncestors()
+        {
+            List<AbstractGuiComponent> components = new List<AbstractGuiComponent>();
+            components.Add(this);
+            if (!_positionInitialized)
+            {
+                GuiCoordinate currentCoordinate = GuiCoordinate;
+                while (currentCoordinate.Parent != null)
+                {
+                    components.Add(currentCoordinate.Parent);
+                    currentCoordinate = currentCoordinate.Parent.GuiCoordinate;
+                }
+            }
+            return components;
         }
     }
 }

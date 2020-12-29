@@ -15,6 +15,7 @@ namespace ClkdUI.Assets
         internal float MaxWidth { get; set; }
         internal float MaxHeight { get; set; }
         public Vector2 Position { get; set; }
+        public int ZIndex { get; set; }
         internal Vector2 Dimensions { get; set; }
         public Rectangle Bounds { get; private set; }
         internal GuiContainer Parent { get; set; }
@@ -24,33 +25,37 @@ namespace ClkdUI.Assets
             AbstractGuiComponent child,
             Vector2 parentPosition = default(Vector2),
             Vector2 parentDimensions = default(Vector2),
-            Vector2 offsets = default(Vector2))
+            Vector2 offsets = default(Vector2),
+            int? zIndex = null)
         {
             Parent = null;
             Child = child;
             UpdateCoordinateValues(
                 parentPosition: parentPosition,
                 parentDimensions: parentDimensions,
-                offsets: offsets);
+                offsets: offsets,
+                zIndex: zIndex);
             Child = child;
         }
 
-        internal void UpdateCoordinate(GuiCoordinate guiCoordinate, Vector2 offsets)
+        internal void UpdateCoordinate(GuiCoordinate guiCoordinate, Vector2 offsets, int? zIndex = null)
         {
             Parent = null;
             UpdateCoordinateValues(
                 parentPosition: guiCoordinate.Position,
                 parentDimensions: guiCoordinate.Dimensions,
-                offsets: offsets);
+                offsets: offsets,
+                zIndex: zIndex);
         }
 
-        internal void UpdateCoordinate(GuiContainer parent, Vector2 offsets)
+        internal void UpdateCoordinate(GuiContainer parent, Vector2 offsets, int? zIndex = null)
         {
             Parent = parent;
             UpdateCoordinateValues(
                 parentPosition: parent.GuiCoordinate.Position,
                 parentDimensions: parent.GuiCoordinate.Dimensions,
-                offsets: offsets);
+                offsets: offsets,
+                zIndex: zIndex);
         }
 
         internal RenderableCoordinate GetRenderableCoordinate()
@@ -58,18 +63,19 @@ namespace ClkdUI.Assets
             return new RenderableCoordinate(
                 x: (int)Position.X,
                 y: (int)Position.Y,
-                z: 1,
+                z: ZIndex,
                 width: (int)Dimensions.X,
                 height: (int)Dimensions.Y,
                 isOffset: false);
         }
 
-        private void UpdateCoordinateValues(Vector2 parentPosition, Vector2 parentDimensions, Vector2 offsets)
+        private void UpdateCoordinateValues(Vector2 parentPosition, Vector2 parentDimensions, Vector2 offsets, int? zIndex)
         {
             ParentPosition = parentPosition;
             ParentDimensions = parentDimensions;
             Offsets = offsets;
             Position = new Vector2(CalculateRealX(), CalculateRealY());
+            ZIndex = zIndex ?? Parent?.GuiCoordinate.ZIndex + 1 ?? 10000;
             Dimensions = new Vector2(CalculateRealWidth(), CalculateRealHeight());
             Bounds = new Rectangle((int)Position.X, (int)Position.Y, (int)Dimensions.X, (int)Dimensions.Y);
         }

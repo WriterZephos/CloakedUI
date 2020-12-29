@@ -49,6 +49,12 @@ namespace ClkdUI.Main
             GuiInputManager = new GuiInputManager();
         }
 
+        internal override sealed void UnfocusInternal()
+        {
+            base.UnfocusInternal();
+            RootContainer.Unfocus();
+        }
+
         private void SetRootGuiCoordinate()
         {
             RootContainer.UpdatePosition(GuiCoordinate, Vector2.Zero);
