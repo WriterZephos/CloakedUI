@@ -6,6 +6,7 @@ using Clkd.Assets;
 using Clkd.Main;
 using ClkdUI.Assets;
 using System.Linq;
+using Clkd.Managers;
 
 namespace ClkdUI.Main
 {
@@ -27,6 +28,7 @@ namespace ClkdUI.Main
         {
             Position = position;
             RootContainer = rootContainer;
+            RenderableManager.BatchStrategies.Add("generatedTexture", new GeneratedTextureBatchStrategy());
         }
 
         public override List<Renderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null)
