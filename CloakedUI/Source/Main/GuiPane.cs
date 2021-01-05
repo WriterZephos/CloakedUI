@@ -16,10 +16,10 @@ namespace ClkdUI.Main
         public GuiInputManager GuiInputManager { get; private set; }
         public Vector2 Position
         {
-            get => GuiCoordinate.Offsets;
+            get => Coordinate.Offsets;
             set
             {
-                GuiCoordinate.Offsets = value;
+                Coordinate.Offsets = value;
             }
         }
         public bool Initialized { get; private set; }
@@ -69,18 +69,18 @@ namespace ClkdUI.Main
 
         private void SetRootGuiCoordinate()
         {
-            GuiCoordinate = BuildGuiCoordinate(Cloaked.GraphicsDeviceManager.GraphicsDevice.Viewport.Bounds, Position);
-            RootContainer.Width = GuiCoordinate.Dimensions.X;
-            RootContainer.Height = GuiCoordinate.Dimensions.Y;
+            Coordinate = BuildGuiCoordinate(Cloaked.GraphicsDeviceManager.GraphicsDevice.Viewport.Bounds, Position);
+            RootContainer.Dimensions.X = Coordinate.ActualDimensions.X;
+            RootContainer.Dimensions.Y = Coordinate.ActualDimensions.Y;
             RootContainer.UpdatePosition(
                 parent: this,
-                offsets: this.GuiCoordinate.Offsets);
+                offsets: this.Coordinate.Offsets);
         }
 
         private GuiCoordinate BuildGuiCoordinate(Rectangle bounds, Vector2 position)
         {
-            this.Width = bounds.Width;
-            this.Height = bounds.Height;
+            this.Dimensions.X = bounds.Width;
+            this.Dimensions.Y = bounds.Height;
             return new GuiCoordinate(
                 parentPosition: new Vector2(bounds.X, bounds.Y),
                 parentDimensions: new Vector2(bounds.Width, bounds.Height),

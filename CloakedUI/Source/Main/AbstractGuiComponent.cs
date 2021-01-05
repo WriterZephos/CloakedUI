@@ -7,82 +7,21 @@ using Clkd.Assets;
 using Clkd.Main;
 using ClkdUI.Assets;
 using ClkdUI.Exceptions;
-using ClkdUI.Main;
 using System.Linq;
+using ClkdUI.Assets.SubComponents;
 
 namespace ClkdUI.Main
 {
     public abstract class AbstractGuiComponent : AbstractComponent
     {
-        public Guid Guid { get; set; }
-        public GuiCoordinate GuiCoordinate { get; set; }
+        public GuiCoordinate Coordinate { get; set; }
         protected bool _positionInitialized = false;
-        private Lazy<GuiInput> _guiInput;
         private bool _inputInitialized = false;
-        public GuiInput Input
-        {
-            get
-            {
-                return _guiInput.Value;
-            }
-        }
-        public float LeftMargin { get; set; }
-        public float RightMargin { get; set; }
-        public float TopMargin { get; set; }
-        public float BottomMargin { get; set; }
-        public float LeftPadding { get; set; }
-        public float RightPadding { get; set; }
-        public float TopPadding { get; set; }
-        public float BottomPadding { get; set; }
-        public bool HasRelativeWidth { get; private set; }
-        private float _width;
-        public float Width
-        {
-            get => _width;
-            set
-            {
-                if (value < 0)
-                {
-                    throw new ArgumentOutOfRangeException("Width", "Width must be greater than zero.");
-                }
-                _width = value;
-                if (value <= 1)
-                {
-                    HasRelativeWidth = true;
-                }
-                else
-                {
-                    HasRelativeWidth = false;
-                }
-            }
-        }
-        public bool HasRelativeHeight { get; private set; }
-        private float _height;
-        public float Height
-        {
-            get => _height;
-            set
-            {
-                if (value < 0)
-                {
-                    throw new ArgumentOutOfRangeException("Height", "Height must be greater than zero.");
-                }
-                _height = value;
-                if (value <= 1)
-                {
-                    HasRelativeHeight = true;
-                }
-                else
-                {
-                    HasRelativeHeight = false;
-                }
-            }
-        }
-        public int ZIndex
-        {
-            get => GuiCoordinate.ZIndex;
-            set => GuiCoordinate.ZIndex = value;
-        }
+        public GuiInput Input { get; }
+        public GuiDirectionalVector4 Margin { get; }
+        public GuiDirectionalVector4 Padding { get; }
+        public GuiDimensions Dimensions { get; set; } = new GuiDimensions();
+
         public bool Focused
         {
             get
@@ -101,29 +40,21 @@ namespace ClkdUI.Main
             }
         }
 
-        internal float RealWidth
-        {
-            get => GuiCoordinate.Dimensions.X;
-        }
-        internal float RealHeight
-        {
-            get => GuiCoordinate.Dimensions.Y;
-        }
-
         public AbstractGuiComponent() : base(canGetRenderables: true, canUpdate: true)
         {
-            GuiCoordinate = new GuiCoordinate(child: this);
-            _guiInput = new Lazy<GuiInput>(() => { return new GuiInput(this); });
-            Guid = Guid.NewGuid();
+            Coordinate = new GuiCoordinate(child: this);
+            Margin = new GuiDirectionalVector4();
+            Padding = new GuiDirectionalVector4();
+            Dimensions = new GuiDimensions();
+            Input = new GuiInput(this);
         }
 
         public abstract override List<Renderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null);
 
-
         public abstract override void Update(GameTime gameTime);
         internal virtual void UpdateInternal(GameTime gameTime)
         {
-            if (_guiInput.IsValueCreated && !_inputInitialized && _positionInitialized)
+            if (!_inputInitialized && _positionInitialized)
             {
                 GetRootPane().GuiInputManager.AddGuiInput(Input);
                 _inputInitialized = true;
@@ -173,11 +104,11 @@ namespace ClkdUI.Main
             components.Add(this);
             if (!_positionInitialized)
             {
-                GuiCoordinate currentCoordinate = GuiCoordinate;
+                GuiCoordinate currentCoordinate = Coordinate;
                 while (currentCoordinate.Parent != null)
                 {
                     components.Add(currentCoordinate.Parent);
-                    currentCoordinate = currentCoordinate.Parent.GuiCoordinate;
+                    currentCoordinate = currentCoordinate.Parent.Coordinate;
                 }
             }
             return components;
@@ -186,7 +117,7 @@ namespace ClkdUI.Main
         internal virtual void UpdatePosition(AbstractGuiComponent parent, Vector2 offsets)
         {
             if (!_positionInitialized) _positionInitialized = true;
-            GuiCoordinate.UpdateCoordinate(
+            Coordinate.UpdateCoordinate(
                 parent: parent,
                 offsets: offsets);
         }
@@ -194,7 +125,7 @@ namespace ClkdUI.Main
         internal virtual void UpdatePosition(GuiCoordinate guiCoordinate, Vector2 offsets)
         {
             if (!_positionInitialized) _positionInitialized = true;
-            GuiCoordinate.UpdateCoordinate(
+            Coordinate.UpdateCoordinate(
                 guiCoordinate: guiCoordinate,
                 offsets: offsets);
         }
@@ -210,10 +141,10 @@ namespace ClkdUI.Main
         private GuiPane GetRootPane()
         {
             if (!_positionInitialized) throw new OrphanedGuiComponentException("This component has not been positioned by a parent, and therefore has no reference to a parent.");
-            GuiCoordinate currentCoordinate = GuiCoordinate;
+            GuiCoordinate currentCoordinate = Coordinate;
             while (currentCoordinate.Parent != null)
             {
-                currentCoordinate = currentCoordinate.Parent.GuiCoordinate;
+                currentCoordinate = currentCoordinate.Parent.Coordinate;
             }
 
             if (currentCoordinate.Child is GuiPane gp)

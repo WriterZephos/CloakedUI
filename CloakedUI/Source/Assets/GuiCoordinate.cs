@@ -11,13 +11,10 @@ namespace ClkdUI.Assets
         internal Vector2 ParentPosition { get; set; }
         internal Vector2 ParentDimensions { get; set; }
         internal Vector2 Offsets { get; set; }
-        internal Vector2 MaxDimensions { get; set; }
-        internal float MaxWidth { get; set; }
-        internal float MaxHeight { get; set; }
-        public Vector2 Position { get; set; }
+        public Vector2 ActualPosition { get; set; }
         public int ZIndex { get; set; }
-        internal Vector2 Dimensions { get; set; }
-        public Rectangle Bounds { get; private set; }
+        internal Vector2 ActualDimensions { get; set; }
+        public Rectangle ActualBounds { get; private set; }
         internal AbstractGuiComponent Parent { get; set; }
         internal AbstractGuiComponent Child { get; set; }
 
@@ -41,8 +38,8 @@ namespace ClkdUI.Assets
         {
             Parent = null;
             UpdateCoordinateValues(
-                parentPosition: guiCoordinate.Position,
-                parentDimensions: guiCoordinate.Dimensions,
+                parentPosition: guiCoordinate.ActualPosition,
+                parentDimensions: guiCoordinate.ActualDimensions,
                 offsets: offsets,
                 zIndex: zIndex);
         }
@@ -51,20 +48,20 @@ namespace ClkdUI.Assets
         {
             Parent = parent;
             UpdateCoordinateValues(
-                parentPosition: parent.GuiCoordinate.Position,
-                parentDimensions: parent.GuiCoordinate.Dimensions,
+                parentPosition: parent.Coordinate.ActualPosition,
+                parentDimensions: parent.Coordinate.ActualDimensions,
                 offsets: offsets,
                 zIndex: zIndex);
         }
 
-        internal RenderableCoordinate GetRenderableCoordinate()
+        internal RenderableCoordinate GetRenderableCoordinate(int zOffset = 0)
         {
             return new RenderableCoordinate(
-                x: (int)Position.X,
-                y: (int)Position.Y,
-                z: ZIndex,
-                width: (int)Dimensions.X,
-                height: (int)Dimensions.Y,
+                x: (int)ActualPosition.X,
+                y: (int)ActualPosition.Y,
+                z: ZIndex + zOffset,
+                width: (int)ActualDimensions.X,
+                height: (int)ActualDimensions.Y,
                 isOffset: false);
         }
 
@@ -73,20 +70,20 @@ namespace ClkdUI.Assets
             ParentPosition = parentPosition;
             ParentDimensions = parentDimensions;
             Offsets = offsets;
-            Position = new Vector2(CalculateRealX(), CalculateRealY());
-            ZIndex = zIndex ?? Parent?.GuiCoordinate.ZIndex + 1 ?? 10000;
-            Dimensions = new Vector2(CalculateRealWidth(), CalculateRealHeight());
-            Bounds = new Rectangle((int)Position.X, (int)Position.Y, (int)Dimensions.X, (int)Dimensions.Y);
+            ActualPosition = new Vector2(CalculateRealX(), CalculateRealY());
+            ZIndex = zIndex ?? Parent?.Coordinate.ZIndex + 25 ?? CloakedGUIConfig.BaseZIndex;
+            ActualDimensions = new Vector2(CalculateRealWidth(), CalculateRealHeight());
+            ActualBounds = new Rectangle((int)ActualPosition.X, (int)ActualPosition.Y, (int)ActualDimensions.X, (int)ActualDimensions.Y);
         }
 
         private float CalculateRealWidth()
         {
-            return Child.HasRelativeWidth ? ParentDimensions.X * Child.Width : Child.Width;
+            return Child.Dimensions.HasRelativeWidth ? ParentDimensions.X * Child.Dimensions.X : Child.Dimensions.X;
         }
 
         private float CalculateRealHeight()
         {
-            return Child.HasRelativeHeight ? ParentDimensions.Y * Child.Height : Child.Height;
+            return Child.Dimensions.HasRelativeHeight ? ParentDimensions.Y * Child.Dimensions.Y : Child.Dimensions.Y;
         }
 
         private float CalculateRealY()

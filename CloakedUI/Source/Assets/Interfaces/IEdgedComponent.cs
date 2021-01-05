@@ -1,8 +1,9 @@
+using ClkdUI.Assets.SubComponents;
+
 namespace ClkdUI.Assets.Interfaces
 {
     public interface IEdgedComponent
     {
-        int Radius { get; set; }
-        float EdgeBlurr { get; set; }
+        Edges Edges { get; }
     }
 }

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Clkd.Assets;
-using Clkd.Main;
 using ClkdUI.Assets.Interfaces;
 using ClkdUI.Main;
 using ClkdUI.Support;
@@ -11,7 +10,17 @@ namespace ClkdUI.Assets.SubComponents
 {
     public class Background
     {
-        public Color Color { get; set; }
+        private Color _color;
+        public Color Color
+        {
+            get => _color;
+            set
+            {
+                _color = value;
+                if (ColorTexture != null) ColorTexture.Dispose();
+                ColorTexture = null;
+            }
+        }
         public Texture2D ColorTexture { get; private set; }
         private bool _textureProcessed = false;
         public Texture2D Texture
@@ -34,14 +43,21 @@ namespace ClkdUI.Assets.SubComponents
                 _sprite = value;
             }
         }
-        internal List<Renderable> GetRenderables<T>(T guiComponent) where T : AbstractGuiComponent, IBackgroundComponent
+        internal List<Renderable> GetRenderables<T>(T guiComponent, Vector3 internalOffsets, bool blurrEdges) where T : AbstractGuiComponent, IBackgroundComponent
         {
-            RecreateColorSprite(guiComponent);
-            ProcessTexture(guiComponent);
+            RenderableCoordinate coordinate = guiComponent.Coordinate.GetRenderableCoordinate((int)internalOffsets.Z);
+            coordinate.X += (int)(internalOffsets.X);
+            coordinate.Y += (int)(internalOffsets.Y);
+            coordinate.Width -= (int)(2 * (internalOffsets.X));
+            coordinate.Height -= (int)(2 * (internalOffsets.Y));
+            float edgeBlurr = blurrEdges ? guiComponent.Edges.EdgeBlurr : 0f;
+
+            RecreateColorSprite(guiComponent, edgeBlurr);
+            ProcessTexture(guiComponent, edgeBlurr);
 
             List<Renderable> renderables = new List<Renderable>();
-            if (ColorSprite != null) renderables.AddRange(ColorSprite.GetRenderables(guiComponent.GuiCoordinate.GetRenderableCoordinate()));
-            if (Sprite != null) renderables.AddRange(Sprite.GetRenderables(guiComponent.GuiCoordinate.GetRenderableCoordinate()));
+            if (ColorSprite != null) renderables.AddRange(ColorSprite.GetRenderables(coordinate));
+            if (Sprite != null) renderables.AddRange(Sprite.GetRenderables(coordinate));
 
             return renderables;
         }
@@ -51,34 +67,34 @@ namespace ClkdUI.Assets.SubComponents
             Sprite = new Sprite("steam", 1, 0, 2398, 2398);
         }
 
-        private void RecreateColorSprite<T>(T guiComponent) where T : AbstractGuiComponent, IBackgroundComponent
+        private void RecreateColorSprite<T>(T guiComponent, float edgeBlurr) where T : AbstractGuiComponent, IBackgroundComponent
         {
-            int width = (int)guiComponent.GuiCoordinate.Dimensions.X;
-            int height = (int)guiComponent.GuiCoordinate.Dimensions.Y;
+            int width = (int)guiComponent.Coordinate.ActualDimensions.X;
+            int height = (int)guiComponent.Coordinate.ActualDimensions.Y;
             if (Color != null)
             {
                 if (ColorTexture == null ||
                      ColorTexture.Width != width ||
                      ColorTexture.Height != height)
                 {
-                    GenerateColorSprite(height, width, guiComponent);
+                    GenerateColorSprite(height, width, guiComponent, edgeBlurr);
                 }
             }
         }
 
-        private void GenerateColorSprite<T>(int height, int width, T guiComponent) where T : AbstractGuiComponent, IBackgroundComponent
+        private void GenerateColorSprite<T>(int height, int width, T guiComponent, float edgeBlurr) where T : AbstractGuiComponent, IBackgroundComponent
         {
             if (ColorTexture != null)
             {
                 ColorTexture.Dispose();
             }
             ColorTexture = Utilities.GetEmptyTexture(width, height, Color);
-            Utilities.DecorateTextureEdges(ColorTexture, guiComponent.Radius, guiComponent.EdgeBlurr);
+            Utilities.CurveAndBlurrEdgesOutward(ColorTexture, guiComponent.Edges.Radius, edgeBlurr);
             ColorSprite = new Sprite(ColorTexture, 0, 0, width, height);
             ColorSprite.BatchStrategy = "generatedTexture";
         }
 
-        private void ProcessTexture<T>(T guiComponent) where T : AbstractGuiComponent, IBackgroundComponent
+        private void ProcessTexture<T>(T guiComponent, float edgeBlurr) where T : AbstractGuiComponent, IBackgroundComponent
         {
             if (!_textureProcessed && Texture != null)
             {
@@ -86,7 +102,7 @@ namespace ClkdUI.Assets.SubComponents
                 Color[] data = new Color[Texture.Width * Texture.Height];
                 Texture.GetData(data);
                 newTexture.SetData(data);
-                Utilities.DecorateTextureEdges(newTexture, guiComponent.Radius, guiComponent.EdgeBlurr);
+                Utilities.CurveAndBlurrEdgesOutward(newTexture, guiComponent.Edges.Radius, edgeBlurr);
                 Sprite = new Sprite(newTexture, Sprite.SpriteCoordinate.X, Sprite.SpriteCoordinate.Y, Sprite.SpriteCoordinate.Width, Sprite.SpriteCoordinate.Height);
                 Sprite.BatchStrategy = "basic";
                 _textureProcessed = true;

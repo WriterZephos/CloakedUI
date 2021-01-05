@@ -70,7 +70,7 @@ namespace ClkdUI.Layouts
             {
                 if (row == 0)
                 {
-                    yOffset = parent.TopPadding;
+                    yOffset = parent.Padding.Top;
                 }
                 else
                 {
@@ -79,7 +79,7 @@ namespace ClkdUI.Layouts
 
                 if (column == 0)
                 {
-                    xOffset = parent.LeftPadding;
+                    xOffset = parent.Padding.Left;
                     maxWidth = 0f;
                 }
 
@@ -96,10 +96,10 @@ namespace ClkdUI.Layouts
                         c.Layout.RecalculateChildren(c);
                     }
 
-                    yOffset += component.RealHeight;
-                    if (component.RealWidth > maxWidth)
+                    yOffset += component.Coordinate.ActualDimensions.Y;
+                    if (component.Coordinate.ActualDimensions.X > maxWidth)
                     {
-                        maxWidth = component.RealWidth;
+                        maxWidth = component.Coordinate.ActualDimensions.X;
                     }
                 }
 

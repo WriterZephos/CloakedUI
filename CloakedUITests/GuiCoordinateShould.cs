@@ -25,7 +25,7 @@ namespace CloakedUITests
                 parentPosition: new Vector2(0f, 0f),
                 parentDimensions: new Vector2(parentWidth, 100f),
                 offsets: new Vector2(0f, 0f));
-            Assert.Equal(sut.Dimensions.X, expectedWidth);
+            Assert.Equal(sut.ActualDimensions.X, expectedWidth);
         }
 
         [Theory]
@@ -43,7 +43,7 @@ namespace CloakedUITests
                 child: rect,
                 parentPosition: new Vector2(0f, 0f),
                 parentDimensions: new Vector2(100f, parentHeight));
-            Assert.Equal(sut.Dimensions.Y, expectedHeight);
+            Assert.Equal(sut.ActualDimensions.Y, expectedHeight);
         }
 
         [Theory]
@@ -58,7 +58,7 @@ namespace CloakedUITests
                 parentPosition: new Vector2(parentRealX, 0f),
                 parentDimensions: new Vector2(100f, 100f),
                 offsets: new Vector2(xOffset, 0f));
-            Assert.Equal(sut.Position.X, expectedRealX);
+            Assert.Equal(sut.ActualPosition.X, expectedRealX);
         }
 
         [Theory]
@@ -73,7 +73,7 @@ namespace CloakedUITests
                 parentPosition: new Vector2(0f, parentRealY),
                 parentDimensions: new Vector2(100f, 100f),
                 offsets: new Vector2(0f, yOffset));
-            Assert.Equal(sut.Position.Y, expectedRealY);
+            Assert.Equal(sut.ActualPosition.Y, expectedRealY);
         }
 
         [Theory]

@@ -31,8 +31,6 @@ namespace ClkdUI.Assets
         }
         public event FocusEventHandler OnFocus;
         public event FocusEventHandler OnUnFocus;
-        public event FocusEventHandler OnIndirectFocus;
-        public event FocusEventHandler OnIndirectUnFocus;
         public event KeyEventHandler OnKeyPressed;
         public event KeyEventHandler OnKeyHeld;
         public event KeyEventHandler OnKeyReleased;
@@ -55,11 +53,11 @@ namespace ClkdUI.Assets
 
             // This GuiInput will go before the other in event handling order, so higher values
             // get to respond to events first.
-            if (Subject.ZIndex > other.Subject.ZIndex) return -1;
+            if (Subject.Coordinate.ZIndex > other.Subject.Coordinate.ZIndex) return -1;
 
             // This GuiInput will follow the other in event handling order, so higher values
             // get to respond to events first.
-            if (Subject.ZIndex < other.Subject.ZIndex) return 1;
+            if (Subject.Coordinate.ZIndex < other.Subject.Coordinate.ZIndex) return 1;
 
             return 0;
         }
@@ -67,7 +65,7 @@ namespace ClkdUI.Assets
         internal bool IsHovered(MouseStateWrapper state)
         {
             if (state == null) return false;
-            return Subject.GuiCoordinate.Bounds.Contains(state.X, state.Y);
+            return Subject.Coordinate.ActualBounds.Contains(state.X, state.Y);
         }
 
         internal void PublishOnKeyPressed(KeyStatus status)
