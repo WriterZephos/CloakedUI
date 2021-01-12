@@ -8,7 +8,6 @@ namespace ClkdUI.Support
 {
     public static class Utilities
     {
-
         public static Texture2D GetEmptyTexture(int width, int height, Color color = default(Color))
         {
             Texture2D texture = new Texture2D(Cloaked.GraphicsDeviceManager.GraphicsDevice, width, height);
@@ -113,7 +112,8 @@ namespace ClkdUI.Support
                     else if (distance > radius - edgeBlurr)
                     {
                         float multiplier = (radius - distance) / edgeBlurr;
-                        data[y * radius + x].A = (byte)(byte.MaxValue * multiplier);
+                        byte alpha = (byte)(byte.MaxValue * multiplier);
+                        data[y * radius + x].A = data[y * quadrant.Width + x].A < alpha ? data[y * quadrant.Width + x].A : alpha;
                     }
                 }
             }
@@ -135,7 +135,8 @@ namespace ClkdUI.Support
                         if (distance > radius - offset - edgeBlurr)
                         {
                             float multiplier = 1f - (radius - distance - offset) / edgeBlurr;
-                            data[y * radius + x].A = (byte)(byte.MaxValue * multiplier);
+                            byte alpha = (byte)(byte.MaxValue * multiplier);
+                            data[y * radius + x].A = data[y * quadrant.Width + x].A < alpha ? data[y * quadrant.Width + x].A : alpha;
                         }
                         else
                         {

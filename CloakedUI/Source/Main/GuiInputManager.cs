@@ -7,9 +7,11 @@ using Microsoft.Xna.Framework;
 
 namespace ClkdUI.Main
 {
+    /// <summary>
+    /// Handles input for CloakedUI.
+    /// </summary>
     public class GuiInputManager
     {
-
         public KeyboardInputManager KeyboardInputManager { get; set; }
         public MouseInputManager MouseInputManager { get; set; }
         public List<GuiInput> GuiInputs { get; set; }
@@ -51,8 +53,13 @@ namespace ClkdUI.Main
             );
 
             MouseInputManager.RegisterMouseMapping(
-                MouseMapping.GetConstantMapping("GuiInputManager", priority: 0),
-                new GenericInputActionTrigger<MouseStatus>((status) => true, (status) => { this.BroadcastMouseEvents(status); })
+                MouseMapping.GetConstantMapping("GuiInputManagerNoButton", priority: 0),
+                new GenericInputActionTrigger<MouseStatus>((status) => true, (status) => { this.BroadcastMouseEventsConstant(status); })
+            );
+
+            MouseInputManager.RegisterMouseMapping(
+                MouseMapping.GetMappingToAnyButton("GuiInputManagerAnyButton", priority: 0),
+                new GenericInputActionTrigger<MouseStatus>((status) => true, (status) => { this.BroadcastMouseEventsAnyButton(status); })
             );
         }
 
@@ -60,7 +67,7 @@ namespace ClkdUI.Main
         {
             foreach (GuiInput guiInput in GuiInputs)
             {
-                if (guiInput.Subject.Focused)
+                if (guiInput.Subject.Input.Focused)
                 {
                     guiInput.PublishOnTextEntered(sender, textInputEventArgs);
                 }
@@ -71,7 +78,7 @@ namespace ClkdUI.Main
         {
             foreach (GuiInput guiInput in GuiInputs)
             {
-                if (guiInput.Subject.Focused)
+                if (guiInput.Subject.Input.Focused)
                 {
                     if (status.IsKeyPressed())
                     {
@@ -90,14 +97,13 @@ namespace ClkdUI.Main
             }
         }
 
-        private void BroadcastMouseEvents(MouseStatus mouseStatus)
+        private void BroadcastMouseEventsConstant(MouseStatus mouseStatus)
         {
             foreach (GuiInput guiInput in GuiInputs)
             {
                 if (guiInput.IsHovered(mouseStatus.MouseState) && !guiInput.IsHovered(mouseStatus.PreviousMouseState))
                 {
                     guiInput.PublishOnMouseEnter(mouseStatus);
-                    guiInput.PublishOnMouseHover(mouseStatus);
                 }
                 else if (guiInput.IsHovered(mouseStatus.MouseState))
                 {
@@ -110,9 +116,28 @@ namespace ClkdUI.Main
 
                 if (guiInput.IsHovered(mouseStatus.MouseState))
                 {
+                    if (mouseStatus.IsScrolled())
+                    {
+                        guiInput.PublishOnMouseScrolled(mouseStatus);
+                    }
+                }
+                if (mouseStatus.StopPropogation) return;
+            }
+        }
+
+        private void BroadcastMouseEventsAnyButton(MouseStatus mouseStatus)
+        {
+            foreach (GuiInput guiInput in GuiInputs)
+            {
+                if (guiInput.IsHovered(mouseStatus.MouseState))
+                {
                     if (mouseStatus.IsClicked())
                     {
                         guiInput.PublishOnMouseClicked(mouseStatus);
+                    }
+                    else if (mouseStatus.IsDragged())
+                    {
+                        guiInput.PublishOnMouseDragged(mouseStatus);
                     }
                     else if (mouseStatus.IsHeld())
                     {
@@ -122,15 +147,7 @@ namespace ClkdUI.Main
                     {
                         guiInput.PublishOnMouseReleased(mouseStatus);
                     }
-
-                    //TODO add scroll support
-                    // if (guiInput.Subject.Focused && mouseStatus.MouseScrolled())
-                    // {
-                    //     guiInput.PublishOnMouseScrolled(status);
-                    // } else
                 }
-
-                if (mouseStatus.StopPropogation) return;
             }
         }
     }

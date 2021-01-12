@@ -10,6 +10,16 @@ using Clkd.Managers;
 
 namespace ClkdUI.Main
 {
+    /// <summary>
+    /// The root node of any CloakedUI GUI that should
+    /// be added to a GameContext. Thise class is not renderable,
+    /// but holds a GuiContainer as the RootContainer that is.
+    /// 
+    /// All other component's positioning is based off this object's position field.
+    /// 
+    /// This object's Initialize method must be called before anyhting will render properly
+    /// or any input will be handled properly.
+    /// </summary>
     public class GuiPane : AbstractGuiComponent
     {
         public GuiContainer RootContainer { get; set; }
@@ -31,7 +41,7 @@ namespace ClkdUI.Main
             RenderableManager.BatchStrategies.Add("generatedTexture", new GeneratedTextureBatchStrategy());
         }
 
-        public override List<Renderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null)
+        public override List<IRenderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null)
         {
             if (!Initialized) return null;
             return RootContainer.GetRenderables();
@@ -51,21 +61,21 @@ namespace ClkdUI.Main
             Initialized = true;
         }
 
-        internal IEnumerable<AbstractGuiComponent> GetFocusedInternal()
+        internal IEnumerable<AbstractGuiComponent> GetChildren()
         {
-            return RootContainer.Layout.Where((guiComponent) => { return guiComponent?.Input.Focused ?? false; });
+            return RootContainer.Layout;
         }
 
-        public List<AbstractGuiComponent> GetFocused()
-        {
-            return GetFocusedInternal().ToList();
-        }
+        // public List<AbstractGuiComponent> GetFocused()
+        // {
+        //     return GetFocusedInternal().ToList();
+        // }
 
-        internal override sealed void UnfocusInternal()
-        {
-            base.UnfocusInternal();
-            RootContainer.Unfocus();
-        }
+        // internal override sealed void UnfocusInternal()
+        // {
+        //     // base.UnfocusInternal();
+        //     // RootContainer.Unfocus();
+        // }
 
         private void SetRootGuiCoordinate()
         {

@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClkdUI.Assets
 {
-    public class GuiContainer : AbstractGuiComponent
+    public class GuiContainer : AbstractInputGuiComponent
     {
         public AbstractGuiLayout Layout { get; set; }
 
@@ -16,13 +16,13 @@ namespace ClkdUI.Assets
             Layout = layout;
         }
 
-        public override List<Renderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null)
+        public override List<IRenderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null)
         {
             return Layout
                 .Where((component) => component != null)
                 .Select(child => child.GetRenderables())
                 .Where((list) => list != null).Aggregate(
-                    new List<Renderable>(),
+                    new List<IRenderable>(),
                     (finalList, list) =>
                     {
                         finalList.AddRange(list);
@@ -54,7 +54,7 @@ namespace ClkdUI.Assets
             base.UnfocusInternal();
             foreach (AbstractGuiComponent c in Layout)
             {
-                if (c != null) c.Unfocus();
+                if (c != null && c is AbstractInputGuiComponent temp) temp.Unfocus();
             }
         }
 

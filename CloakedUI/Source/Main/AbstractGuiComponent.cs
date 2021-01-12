@@ -9,93 +9,42 @@ using ClkdUI.Assets;
 using ClkdUI.Exceptions;
 using System.Linq;
 using ClkdUI.Assets.SubComponents;
+using ClkdUI.SubComponents;
+using ClkdUI.Assets.Interfaces;
 
 namespace ClkdUI.Main
 {
-    public abstract class AbstractGuiComponent : AbstractComponent
+    public abstract class AbstractGuiComponent : AbstractStatefulGuiComponent
     {
         public GuiCoordinate Coordinate { get; set; }
+        public GuiDirectionalVector4 Margin { get => GetInternalState<GuiDirectionalVector4>("Margin", this); }
+        public GuiDirectionalVector4 Padding { get => GetInternalState<GuiDirectionalVector4>("Padding", this); }
+        public GuiDimensions Dimensions { get => GetInternalState<GuiDimensions>("Dimensions", this); }
+        public Background Background { get => GetInternalState<Background>("Background", this); }
+        public Border Border { get => GetInternalState<Border>("Border", this); }
+        public Edges Edges { get => GetInternalState<Edges>("Edges", this); }
+        public Text Text { get => GetInternalState<Text>("Text", this); }
+
         protected bool _positionInitialized = false;
-        private bool _inputInitialized = false;
-        public GuiInput Input { get; }
-        public GuiDirectionalVector4 Margin { get; }
-        public GuiDirectionalVector4 Padding { get; }
-        public GuiDimensions Dimensions { get; set; } = new GuiDimensions();
 
-        public bool Focused
+        public AbstractGuiComponent()
         {
-            get
-            {
-                if (_inputInitialized)
-                {
-                    return Input.Focused;
-                }
-                return false;
-            }
-            internal set
-            {
-
-                Input.Focused = value;
-
-            }
+            Coordinate = new GuiCoordinate(this);
+            SetState();
         }
 
-        public AbstractGuiComponent() : base(canGetRenderables: true, canUpdate: true)
+        protected override AbstractGuiComponentState SetState()
         {
-            Coordinate = new GuiCoordinate(child: this);
-            Margin = new GuiDirectionalVector4();
-            Padding = new GuiDirectionalVector4();
-            Dimensions = new GuiDimensions();
-            Input = new GuiInput(this);
+            InternalState = new BasicGuiComponentState();
+            return InternalState;
         }
 
-        public abstract override List<Renderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null);
+        public abstract override List<IRenderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null);
 
         public abstract override void Update(GameTime gameTime);
         internal virtual void UpdateInternal(GameTime gameTime)
         {
-            if (!_inputInitialized && _positionInitialized)
-            {
-                GetRootPane().GuiInputManager.AddGuiInput(Input);
-                _inputInitialized = true;
-            }
             Update(gameTime);
-        }
-
-        // Because some internal classes need to override this 
-        // method, it is virtual and internal. A proxy method is then
-        // provided to expost unfocusing to external use.
-        internal virtual void UnfocusInternal()
-        {
-            Focused = false;
-        }
-
-        public void Unfocus()
-        {
-            UnfocusInternal();
-        }
-
-        // Because some internal classes need to override this 
-        // method, it is virtual and internal. A proxy method is then
-        // provided to expost unfocusing to external use.
-        internal virtual void FocusInternal()
-        {
-            List<AbstractGuiComponent> focused = GetHierarchy();
-            IEnumerable<AbstractGuiComponent> unfocused = GetRootPane().GetFocusedInternal().Except(focused);
-            foreach (AbstractGuiComponent guiComponent in unfocused)
-            {
-                guiComponent.Focused = false;
-            }
-
-            foreach (AbstractGuiComponent guiComponent in focused)
-            {
-                guiComponent.Focused = true;
-            }
-        }
-
-        public void Focus()
-        {
-            FocusInternal();
         }
 
         public List<AbstractGuiComponent> GetHierarchy()
@@ -130,15 +79,7 @@ namespace ClkdUI.Main
                 offsets: offsets);
         }
 
-        internal void Remove()
-        {
-            if (_inputInitialized)
-            {
-                GetRootPane().GuiInputManager.RemoveGuiInput(Input);
-            }
-        }
-
-        private GuiPane GetRootPane()
+        protected GuiPane GetRootPane()
         {
             if (!_positionInitialized) throw new OrphanedGuiComponentException("This component has not been positioned by a parent, and therefore has no reference to a parent.");
             GuiCoordinate currentCoordinate = Coordinate;

@@ -8,13 +8,13 @@ namespace ClkdUI.Assets
 {
 
     public delegate void FocusEventHandler(AbstractGuiComponent sender);
-    public delegate void MouseEventHandler(AbstractGuiComponent sender, MouseStatus e);
-    public delegate void KeyEventHandler(AbstractGuiComponent sender, KeyStatus e);
+    public delegate void MouseEventHandler(AbstractGuiComponent sender, MouseStatus mouseStatus);
+    public delegate void KeyEventHandler(AbstractGuiComponent sender, KeyStatus keyStatus);
     public delegate void TextInputEventHandler(AbstractGuiComponent sender, TextInputEventArgs args);
 
     public class GuiInput : IComparable<GuiInput>
     {
-        internal AbstractGuiComponent Subject { get; set; }
+        internal AbstractInputGuiComponent Subject { get; set; }
         private bool _focused;
         internal bool Focused
         {
@@ -29,6 +29,19 @@ namespace ClkdUI.Assets
                 }
             }
         }
+        private bool _hovered;
+        internal bool Hovered
+        {
+            get => _hovered;
+        }
+        private void SetHovered(MouseStatus mouseStatus, bool value)
+        {
+            if (value != _hovered)
+            {
+                _hovered = value;
+                if (value && OnMouseHover != null) OnMouseHover(Subject, mouseStatus);
+            }
+        }
         public event FocusEventHandler OnFocus;
         public event FocusEventHandler OnUnFocus;
         public event KeyEventHandler OnKeyPressed;
@@ -41,10 +54,14 @@ namespace ClkdUI.Assets
         public event MouseEventHandler OnMouseEnter;
         public event MouseEventHandler OnMouseHover;
         public event MouseEventHandler OnMouseExit;
+        public event MouseEventHandler OnMouseDragged;
+        public event MouseEventHandler OnMouseScrolled;
 
-        internal GuiInput(AbstractGuiComponent subject)
+        internal GuiInput(AbstractInputGuiComponent subject)
         {
             Subject = subject;
+            OnMouseEnter += (AbstractGuiComponent sender, MouseStatus mouseStatus) => SetHovered(mouseStatus, true);
+            OnMouseExit += (AbstractGuiComponent sender, MouseStatus mouseStatus) => SetHovered(mouseStatus, false);
         }
 
         public int CompareTo(GuiInput other)
@@ -116,6 +133,16 @@ namespace ClkdUI.Assets
         internal void PublishOnMouseReleased(MouseStatus mouseStatus)
         {
             if (OnMouseReleased != null) OnMouseReleased(Subject, mouseStatus);
+        }
+
+        internal void PublishOnMouseDragged(MouseStatus mouseStatus)
+        {
+            if (OnMouseDragged != null) OnMouseDragged(Subject, mouseStatus);
+        }
+
+        internal void PublishOnMouseScrolled(MouseStatus mouseStatus)
+        {
+            if (OnMouseScrolled != null) OnMouseScrolled(Subject, mouseStatus);
         }
     }
 }

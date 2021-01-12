@@ -49,7 +49,8 @@ namespace ClkdUI.Layouts
         {
             if (Components[row, column] != null)
             {
-                Components[row, column].Remove();
+
+                if (Components[row, column] is AbstractInputGuiComponent temp) temp.Remove();
                 Components[row, column] = null;
             }
         }

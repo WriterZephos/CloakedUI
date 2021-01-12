@@ -11,37 +11,43 @@ namespace ClkdUI.Assets
     //TODO: Extract a parent class that is just a rect, 
     //then add support for custom textures and rename this class or make a similar class
     //called TexturedRectangle
-    public class ColoredRectangle : AbstractGuiComponent, IBackgroundComponent, IBorderComponent
+    public class ColoredRectangle : AbstractInputGuiComponent
     {
-        private Lazy<Edges> _edges = new Lazy<Edges>();
-        public Edges Edges
-        {
-            get => _edges.Value;
-        }
-        public Background Background { get; set; }
-        public Border Border { get; set; }
 
-        public ColoredRectangle(float width, float height, Color color) : base()
+
+        public ColoredRectangle(float width, float height, Color color)
         {
             Dimensions.X = width;
             Dimensions.Y = height;
-            //Background = new Background();
-            //Border = new Border();
-            // Background.Color = color;
+            Background.Color = color;
         }
-        public override List<Renderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null)
+        public override List<IRenderable> GetRenderables(RenderableCoordinate? renderableCoordinate = null)
         {
-            List<Renderable> renderables = new List<Renderable>();
-            Vector3 internalOffsets = new Vector3(0, 0, 1);
+            List<IRenderable> renderables = new List<IRenderable>();
+            Vector3 internalOffsets = new Vector3(0, 0, 0);
             if (Border != null)
             {
-                renderables.AddRange(Border.GetRenderables(this));
-                internalOffsets.X = Edges.EdgeBlurr + Border.Width + Edges.InnerEdgeBlurr;
+                internalOffsets.Z = 2;
+                renderables.Condense(Border.GetRenderables(this, internalOffsets));
+                internalOffsets.X = Edges.EdgeBlurr;
+                internalOffsets.Y = Edges.EdgeBlurr;
             }
 
             if (Background != null)
             {
-                renderables.AddRange(Background.GetRenderables(this, internalOffsets, Border != null));
+                internalOffsets.Z = 1;
+                renderables.Condense(Background.GetRenderables(this, internalOffsets, Border == null));
+            }
+
+            if (Text != null)
+            {
+                internalOffsets.Z = 3;
+                if (Border != null)
+                {
+                    internalOffsets.X = Edges.EdgeBlurr + Edges.InnerEdgeBlurr + Border.Width;
+                    internalOffsets.Y = Edges.EdgeBlurr + Edges.InnerEdgeBlurr + Border.Width;
+                }
+                renderables.Condense(Text.GetRenderables(this, internalOffsets));
             }
 
             return renderables;
